@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fuente y colores base */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f5f4f2; /* tono hueso */
+  color: #111;
+  line-height: 1.5;
+}

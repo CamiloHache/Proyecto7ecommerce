@@ -1,0 +1,17 @@
+.hero {
+  background-image: url('../../assets/img/texturaroja.png');
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 80px 24px;
+}
+
+.hero img {
+  max-width: 1100px;   /* 🔥 CLAVE */
+  width: 100%;
+  height: auto;
+}

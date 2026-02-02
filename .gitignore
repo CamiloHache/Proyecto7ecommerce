@@ -1,0 +1,12 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (¡Súper importante!)
+.env
+
+# Archivo de la rúbrica (o el nombre exacto que tenga tu archivo)
+rubrica.md
+rubrica.pdf
+
+# Archivos de sistema
+.DS_Store

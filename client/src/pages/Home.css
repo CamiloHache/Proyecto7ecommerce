@@ -1,0 +1,45 @@
+.home-products {
+  padding: 64px 24px;
+  background: #fff;
+}
+
+.home-products-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.home-products h2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 32px;
+  color: #1f1f1c;
+}
+
+.home-products .products-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px;
+  justify-content: space-evenly;
+  margin-bottom: 40px;
+}
+
+.home-products-link {
+  display: block;
+  text-align: center;
+  font-weight: 600;
+  color: #1f1f1c;
+  text-decoration: none;
+  padding: 12px 24px;
+  border: 2px solid #1f1f1c;
+  border-radius: 8px;
+  max-width: 260px;
+  margin: 0 auto;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.home-products-link:hover {
+  background-color: #1f1f1c;
+  color: #fff;
+}

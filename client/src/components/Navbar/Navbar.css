@@ -1,0 +1,171 @@
+.navbar {
+  font-family: inherit;
+}
+
+
+/* CONTENEDOR GENERAL */
+.navbar-header,
+.navbar {
+  width: 100%;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* FILA SUPERIOR */
+.navbar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 30px 60px;
+  background-color: #f6f4f1;
+}
+
+.navbar-logo {
+  height: 80px;
+}
+
+/* Acciones derecha */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+/* Botones auth */
+.nav-btn {
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  color: #1f1f1c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn.nav-btn-outline,
+.nav-btn.outline {
+  border: 3px solid #1f1f1c;
+  padding: 10px 20px;
+  border-radius: 8px;
+  min-height: 44px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-btn.nav-btn-outline:hover,
+.nav-btn.outline:hover {
+  background-color: #1f1f1c;
+  color: #fff;
+}
+
+/* Buscador */
+.navbar-search {
+  font-size: 1rem;
+  padding: 8px 10px;
+  border-radius: 20px;
+  border: 6px solid #ccc;
+  width: 350px;
+}
+
+.search-icon {
+  font-size: 1rem;
+}
+
+
+/* FILA INFERIOR — MENÚ */
+.navbar-menu {
+  background-color: #1c1c1c;
+}
+
+.navbar-menu ul {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.navbar-menu li {
+  color: #f6f4f1;
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: 26px;
+  cursor: pointer;
+}
+.nav-menu {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  background-color: #1f1f1c;
+}
+.nav-item {
+  position: relative;
+}
+.nav-link {
+  background: none;
+  border: none;
+  color: #f5f1e8;
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #ffffff;
+  min-width: 260px;        
+  padding: 0.5rem 0;        
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+  z-index: 1000;
+}
+
+.nav-item:hover .dropdown {
+  display: flex;
+}
+.dropdown a {
+  padding: 1rem 1.5rem;
+  color: #1f1f1c;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown a:hover {
+  background-color: #ece7dc;
+}
+
+.auth-btn {
+  height: 42px;
+  padding: 0 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.login-btn {
+  background: transparent;
+  border: 1.5px solid #1f1f1c;
+  color: #1f1f1c;
+}
+
+.register-btn {
+  background: #1f1f1c;
+  border: 1.5px solid #1f1f1c;
+  color: #ffffff;
+}
+.navbar-right {
+  display: flex;
+  align-items: center;  
+  gap: 0.75rem;
+}
