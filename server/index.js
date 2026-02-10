@@ -3,25 +3,31 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+// 1. Importación de Rutas
 const productRoutes = require('./routes/productRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 const app = express();
 
-// Middleware
+// 2. Middlewares
 app.use(cors());
 app.use(express.json());
-app.use('/api/products', productRoutes);
 
-// Conexión a la base de datos
+// 3. Conexión a MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('🛢️ Conexión a la base de datos exitosa'))
     .catch((error) => console.log('Error de conexión:', error));
 
-//Ruta de prueba
+// 4. Definición de Rutas
+app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
+
+// 5. Ruta de prueba
 app.get('/', (req, res) => {
-    res.send('🚀 Servidor del Proyecto 7 funcionando');
+    res.send('🚀 Servidor de MEMORICE funcionando');
 });
 
-//Arrancar el servidor
+// 6. Arrancar servidor
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
