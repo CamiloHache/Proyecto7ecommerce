@@ -1,63 +1,44 @@
-import { Link } from "react-router-dom";
-import "./Signup.css";
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../context/userContext";
 import logo from "../assets/img/logo-blk3.png";
+import "./Login.css"; // Usa el mismo CSS si es compartido
 
 const Signup = () => {
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const { register } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const result = await register(nombre, email, password);
+    if (result.success) {
+      alert("Registro exitoso. Ahora inicia sesión.");
+      navigate("/login");
+    } else {
+      setError(result.msg);
+    }
+  };
+
   return (
-    <div className="signup-page">
-      <div className="signup-card">
-        <Link to="/" className="signup-logo-wrap">
-          <img src={logo} alt="Memorice" className="signup-logo" />
-        </Link>
+    <div className="login-page">
+      <div className="login-card">
+        <Link to="/"><img src={logo} alt="Logo" className="login-logo" /></Link>
         <h1>Crear cuenta</h1>
-        <p className="signup-intro">
-          Regístrate para acceder a tu perfil, pedidos y contenido exclusivo.
-        </p>
-
-        <form className="signup-form" onSubmit={(e) => e.preventDefault()}>
-          <label htmlFor="name">Nombre completo</label>
-          <input
-            id="name"
-            type="text"
-            placeholder="Tu nombre"
-            autoComplete="name"
-          />
-
-          <label htmlFor="email">Correo electrónico</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="tu@correo.com"
-            autoComplete="email"
-          />
-
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-
-          <label htmlFor="confirm">Confirmar contraseña</label>
-          <input
-            id="confirm"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-
-          <button type="submit" className="signup-submit">
-            Registrarme
-          </button>
+        <form className="login-form" onSubmit={handleSubmit}>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <label>Nombre</label>
+          <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+          <label>Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <label>Contraseña</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <button type="submit" className="login-submit">Registrarme</button>
         </form>
-
-        <p className="signup-footer">
-          ¿Ya tienes cuenta?{" "}
-          <Link to="/login" className="signup-link">
-            Iniciar sesión
-          </Link>
-        </p>
       </div>
     </div>
   );
