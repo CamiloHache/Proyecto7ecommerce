@@ -21,6 +21,10 @@ mongoose.connect(process.env.MONGODB_URI)
 // 4. Definición de Rutas
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+const checkoutRoutes = require('./routes/checkoutRoutes');
+
+// Usar la ruta
+app.use('/api/checkout', checkoutRoutes);
 
 // 5. Ruta de prueba
 app.get('/', (req, res) => {
