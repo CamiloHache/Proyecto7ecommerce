@@ -1,20 +1,18 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../context/userContext"; 
+import { UserContext } from "../context/userContext";
 import logo from "../assets/img/logo-blk3.png";
 import "./Login.css";
 
 const Login = () => {
-  // 1. Estados para capturar lo que el usuario escribe
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
 
-  // 2. Traemos la función login y el router
   const { login } = useContext(UserContext);
   const navigate = useNavigate();
 
-  // 3. Función que se ejecuta al dar click en "Entrar"
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -22,10 +20,8 @@ const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      // Si todo sale bien, vamos al inicio
       navigate("/");
     } else {
-      // Si el backend dice que hay error, lo mostramos
       setError(result.msg);
     }
   };
@@ -41,10 +37,19 @@ const Login = () => {
           Ingresa con tu cuenta para acceder a tu perfil y pedidos.
         </p>
 
-        {/* 4. Agregamos el onSubmit y mostramos el error si existe */}
         <form className="login-form" onSubmit={handleSubmit}>
-          {error && <p style={{ color: 'red', marginBottom: '10px', textAlign: 'center' }}>{error}</p>}
-          
+          {error && (
+            <p
+              style={{
+                color: "red",
+                marginBottom: "10px",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </p>
+          )}
+
           <label htmlFor="email">Correo electrónico</label>
           <input
             id="email"
@@ -57,15 +62,29 @@ const Login = () => {
           />
 
           <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="password-field">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="password-toggle password-toggle-icon"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+            >
+              {showPassword ? (
+                <span className="icon-eye-off" />
+              ) : (
+                <span className="icon-eye" />
+              )}
+            </button>
+          </div>
 
           <button type="submit" className="login-submit">
             Entrar

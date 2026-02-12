@@ -100,3 +100,87 @@
 .login-link:hover {
   text-decoration: underline;
 }
+
+.password-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-field input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.password-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid #d2cec6;
+  background: #f8f6f1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.password-toggle:hover {
+  background: #ece7dc;
+}
+
+.password-toggle-icon .icon-eye,
+.password-toggle-icon .icon-eye-off {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  position: relative;
+  border-radius: 999px;
+}
+
+/* Icono ojo */
+.icon-eye {
+  border: 1.5px solid #555;
+  border-radius: 999px;
+}
+
+.icon-eye::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: #555;
+}
+
+/* Icono ojo tachado */
+.icon-eye-off {
+  border: 1.5px solid #555;
+  border-radius: 999px;
+}
+
+.icon-eye-off::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: #555;
+}
+
+.icon-eye-off::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 130%;
+  height: 1.5px;
+  background: #555;
+  transform: translate(-50%, -50%) rotate(-35deg);
+}

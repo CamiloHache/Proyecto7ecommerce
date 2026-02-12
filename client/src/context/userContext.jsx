@@ -5,14 +5,30 @@ import axios from "axios";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(
+    () => JSON.parse(localStorage.getItem("user") || "null")
+  );
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post("http://localhost:4000/api/auth/login", { email, password });
-      setToken(res.data.token);
-      localStorage.setItem("token", res.data.token);
+      const res = await axios.post("http://localhost:4000/api/auth/login", {
+        email,
+        password,
+      });
+
+      const { token: tokenResp, user: userResp, nombre } = res.data;
+
+      setToken(tokenResp);
+      localStorage.setItem("token", tokenResp);
+
+      const userData =
+        userResp ||
+        (nombre ? { nombre } : { nombre: email.split("@")[0] || "Usuario" });
+
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+
       return { success: true };
     } catch (error) {
       return { success: false, msg: error.response?.data?.msg || "Error al conectar" };
@@ -21,7 +37,11 @@ export const UserProvider = ({ children }) => {
 
   const register = async (nombre, email, password) => {
     try {
-      await axios.post("http://localhost:4000/api/auth/register", { nombre, email, password });
+      await axios.post("http://localhost:4000/api/auth/register", {
+        nombre,
+        email,
+        password,
+      });
       return { success: true };
     } catch (error) {
       return { success: false, msg: error.response?.data?.msg || "Error al registrar" };
@@ -32,6 +52,7 @@ export const UserProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem("token");
     setUser(null);
+    localStorage.removeItem("user");
   };
 
   return (

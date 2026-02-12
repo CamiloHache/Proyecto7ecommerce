@@ -28,7 +28,12 @@
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 50px;
+  gap: 24px;
+}
+
+.navbar-greeting {
+  font-size: 0.95rem;
+  color: #444;
 }
 
 /* Botones auth */

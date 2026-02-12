@@ -1,8 +1,13 @@
 import "./Navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../../context/userContext";
 import logo from "../../assets/img/logo-blk3.png";
 
 const Navbar = () => {
+  const { token, user, logout } = useContext(UserContext);
+  const navigate = useNavigate();
+
   return (
     <header className="navbar-header">
       <div className="navbar-top">
@@ -11,12 +16,79 @@ const Navbar = () => {
         </Link>
 
         <div className="navbar-actions">
-          <Link to="/login" className="nav-btn nav-btn-outline">
-            Login
+          {token && (
+            <span className="navbar-greeting">
+              Hola {user?.nombre || "usuario"}
+            </span>
+          )}
+
+          <Link to="/cart" className="nav-btn nav-btn-outline">
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "4px",
+                  border: "2px solid #1f1f1c",
+                  position: "relative",
+                }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "2px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "60%",
+                    height: "2px",
+                    backgroundColor: "#1f1f1c",
+                  }}
+                />
+              </span>
+              <span>Carrito</span>
+            </span>
           </Link>
-          <Link to="/signup" className="nav-btn nav-btn-outline">
-            Sign up
-          </Link>
+
+          {!token && (
+            <>
+              <Link to="/login" className="nav-btn nav-btn-outline">
+                Login
+              </Link>
+              <Link to="/signup" className="nav-btn nav-btn-outline">
+                Sign up
+              </Link>
+            </>
+          )}
+
+          {token && (
+            <>
+              <button
+                type="button"
+                className="nav-btn nav-btn-outline"
+                disabled
+                style={{ opacity: 0.6, cursor: "default" }}
+              >
+                Registrado
+              </button>
+              <button
+                type="button"
+                className="nav-btn nav-btn-outline"
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </button>
+            </>
+          )}
           <input
             type="text"
             placeholder="Buscar…"
