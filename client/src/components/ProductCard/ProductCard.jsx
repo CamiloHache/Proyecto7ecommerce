@@ -1,31 +1,28 @@
 import { useContext } from "react";
-import { CartContext } from "../../context/cartContext";
+import { CartContext } from "../../context/cartContext"; // Subimos 2 niveles para llegar al contexto
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
 
-  // Validación de seguridad: Si no hay producto, no renderizamos nada (o un cargando)
+  // Seguridad: Si por alguna razón el producto llega vacío, no renderiza nada para no romper la app
   if (!product) return null;
 
   return (
-    <div className="border rounded-lg shadow-sm p-4 flex flex-col items-center">
-      {/* Usamos el signo ? para que si image no existe, no rompa la app */}
+    <div className="border border-gray-200 rounded-lg shadow-lg p-4 flex flex-col items-center bg-white transition hover:shadow-xl">
       <img 
-        src={product?.image} 
-        alt={product?.name} 
-        className="w-full h-48 object-cover rounded-md" 
+        src={product.image} 
+        alt={product.name} 
+        className="w-full h-48 object-cover rounded-md mb-4" 
       />
-      <h3 className="text-lg font-bold mt-2">{product?.name}</h3>
-      <p className="text-gray-600">
-        ${product?.price ? product.price.toLocaleString() : "0"}
-      </p>
+      <h3 className="text-lg font-bold text-gray-800">{product.name}</h3>
+      <p className="text-gray-600 mb-4">${product.price?.toLocaleString()}</p>
       
       <button 
         onClick={() => {
           addToCart(product);
-          alert(`${product.name} añadido al carrito`);
+          alert(`${product.name} agregado al carrito 🛒`);
         }}
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition"
       >
         Añadir al carrito
       </button>

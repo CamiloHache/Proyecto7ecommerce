@@ -2,26 +2,29 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
+// 1. Creamos el contexto (la "nube" donde vivirán los datos)
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
 
+  // 2. useEffect: Se ejecuta una sola vez cuando carga la app
   useEffect(() => {
-    // Creamos la función DENTRO del useEffect para que Cursor no sospeche
-    const fetchProducts = async () => {
+    const getProducts = async () => {
       try {
+        // Pide los datos al servidor (Asegúrate que tu backend corra en el 4000)
         const res = await axios.get("http://localhost:4000/api/products");
+        // Guarda los datos en el estado
         setProducts(res.data);
       } catch (error) {
-        console.error("Error al traer productos:", error);
+        console.error("Error obteniendo productos:", error);
       }
     };
-    
-    fetchProducts();
-  }, []); // El array vacío asegura que solo ocurra una vez
+    getProducts();
+  }, []);
 
   return (
+    // 3. Provider: "Reparte" la lista de productos a toda la app
     <ProductContext.Provider value={{ products }}>
       {children}
     </ProductContext.Provider>
