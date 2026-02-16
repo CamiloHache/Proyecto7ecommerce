@@ -7,16 +7,21 @@ router.post('/', async (req, res) => {
     try {
         const { products } = req.body;
 
-        const lineItems = products.map((product) => ({
-            price_data: {
-                currency: 'clp',
-                product_data: {
-                    name: product.name,
+        const lineItems = products.map((product) => {
+            const nombreProducto = product.nombre || product.name;
+            const precioProducto = product.precio || product.price;
+
+            return {
+                price_data: {
+                    currency: 'clp',
+                    product_data: {
+                        name: nombreProducto,
+                    },
+                    unit_amount: precioProducto,
                 },
-                unit_amount: product.price,
-            },
-            quantity: product.quantity,
-        }));
+                quantity: product.quantity,
+            };
+        });
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],

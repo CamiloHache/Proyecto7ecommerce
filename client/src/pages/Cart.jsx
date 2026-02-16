@@ -7,13 +7,11 @@ const Cart = () => {
   const { cart, removeFromCart, totalPrice } = useContext(CartContext);
 
   const handleCheckout = () => {
-    // Para la demoday dejamos el pago simulado y evitamos errores de backend/Stripe
     alert(
       "Esta es una demo visual. La pasarela de pago se activará cuando el backend esté configurado."
     );
   };
 
-  // Si el carrito está vacío
   if (!cart || cart.length === 0) {
     return (
       <section className="cart-page cart-page-empty">
@@ -39,12 +37,12 @@ const Cart = () => {
               <div key={item._id} className="cart-item">
                 <div className="cart-item-info">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={item.imagen}
+                    alt={item.nombre}
                     className="cart-item-image"
                   />
                   <div className="cart-item-text">
-                    <h3>{item.name || "Producto"}</h3>
+                    <h3>{item.nombre || "Producto"}</h3>
                     <p>Cantidad: {item.quantity}</p>
                   </div>
                 </div>
@@ -53,7 +51,7 @@ const Cart = () => {
                   <p>
                     $
                     {(
-                      (item.price || 0) * (item.quantity || 1)
+                      (item.precio || 0) * (item.quantity || 1)
                     ).toLocaleString()}
                   </p>
                   <button

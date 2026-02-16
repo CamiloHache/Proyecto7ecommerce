@@ -1,10 +1,9 @@
 import { useContext } from "react";
-import { ProductContext } from "../context/productContext"; // Importamos el contexto real
+import { ProductContext } from "../context/productContext"; 
 import ProductCard from "../components/ProductCard/ProductCard";
 import "./Products.css";
 
 const ProductsPage = () => {
-  // Traemos los productos de la base de datos
   const { products } = useContext(ProductContext);
 
   return (
@@ -19,7 +18,7 @@ const ProductsPage = () => {
             products.map((p) => (
               <ProductCard
                 key={p._id}
-                product={p} // Le pasamos el objeto completo 'p'
+                product={p}
               />
             ))
           ) : (

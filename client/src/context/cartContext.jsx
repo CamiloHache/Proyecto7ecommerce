@@ -22,7 +22,10 @@ export const CartProvider = ({ children }) => {
     setCart(cart.filter((item) => item._id !== productId));
   };
 
-  const totalPrice = cart.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + ((item.precio || 0) * (item.quantity || 1)),
+    0
+  );
 
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, totalPrice }}>

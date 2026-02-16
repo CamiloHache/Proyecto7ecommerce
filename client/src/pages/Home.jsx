@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-// Importamos el contexto con 'p' minúscula como está en tu repo
 import { ProductContext } from "../context/productContext"; 
 import Hero from "../components/Hero/Hero";
 import ProyectoSection from "../components/ProyectoSection/ProyectoSection";
@@ -28,7 +27,6 @@ const proyectoBlocks = [
 ];
 
 const Home = () => {
-  // 1. Extraemos los productos reales de la base de datos
   const { products } = useContext(ProductContext);
 
   return (
@@ -41,13 +39,12 @@ const Home = () => {
         <div className="home-products-inner">
           <h2>Productos destacados</h2>
           <div className="products-grid">
-            {/* 2. En lugar de 3 ProductCards manuales, mapeamos los de la DB */}
+            {}
             {products && products.length > 0 ? (
-              // Mostramos solo los primeros 3 para el Home (destacados)
               products.slice(0, 3).map((product) => (
                 <ProductCard
                   key={product._id}
-                  product={product} // IMPORTANTE: Pasamos el objeto completo
+                  product={product} 
                 />
               ))
             ) : (

@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 import logo from "../assets/img/logo-blk3.png";
-import "./Login.css"; // Reutilizamos estilos
+import "./Login.css"; 
 
 const Signup = () => {
   const [nombre, setNombre] = useState("");

@@ -10,3 +10,6 @@ rubrica.pdf
 
 # Archivos de sistema
 .DS_Store
+
+# Carpeta automática de cursor
+.cursor/

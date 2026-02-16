@@ -60,7 +60,15 @@ exports.loginUser = async (req, res) => {
             { expiresIn: '2h' },    // El token durará 2 horas
             (error, token) => {
                 if (error) throw error;
-                res.json({ token }); // Respondemos con el token generado
+                res.json({
+                    token,
+                    user: {
+                        id: user._id,
+                        nombre: user.nombre,
+                        email: user.email,
+                        rol: user.rol,
+                    },
+                }); // Respondemos con token y usuario sin password
             }
         );
 

@@ -22,9 +22,14 @@ export const UserProvider = ({ children }) => {
       setToken(tokenResp);
       localStorage.setItem("token", tokenResp);
 
-      const userData =
-        userResp ||
-        (nombre ? { nombre } : { nombre: email.split("@")[0] || "Usuario" });
+      const userData = userResp
+        ? {
+            id: userResp.id,
+            nombre: userResp.nombre || "Usuario",
+            email: userResp.email || email,
+            rol: userResp.rol || "cliente",
+          }
+        : (nombre ? { nombre } : { nombre: email.split("@")[0] || "Usuario" });
 
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
