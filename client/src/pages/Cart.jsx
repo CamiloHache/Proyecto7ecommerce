@@ -1,15 +1,88 @@
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import { CartContext } from "../context/cartContext";
-import { Link } from "react-router-dom";
+import { UserContext } from "../context/userContext";
+import { Link, useNavigate } from "react-router-dom";
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
 import "./Cart.css";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { cart, removeFromCart, totalPrice } = useContext(CartContext);
+  const { token } = useContext(UserContext);
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
-  const handleCheckout = () => {
-    alert(
-      "Esta es una demo visual. La pasarela de pago se activará cuando el backend esté configurado."
-    );
+  const apiUrl = useMemo(
+    () => import.meta.env.VITE_API_URL || "http://localhost:4000",
+    []
+  );
+  const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+
+  const handleCheckout = async () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    if (!stripePublicKey) {
+      setCheckoutError(
+        "Falta configurar VITE_STRIPE_PUBLIC_KEY en el frontend."
+      );
+      return;
+    }
+
+    try {
+      setIsProcessingCheckout(true);
+      setCheckoutError("");
+
+      const productsPayload = cart.map((item) => ({
+        id: item._id,
+        nombre: item.nombre,
+        name: item.nombre,
+        precio: item.precio,
+        price: item.precio,
+        quantity: item.quantity || 1,
+      }));
+
+      const res = await axios.post(
+        `${apiUrl}/api/checkout`,
+        { products: productsPayload },
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      const stripe = await loadStripe(stripePublicKey);
+
+      if (!stripe) {
+        setCheckoutError(
+          "No fue posible inicializar Stripe. Revisa la clave pública."
+        );
+        return;
+      }
+
+      const sessionId = res.data?.id;
+      if (!sessionId) {
+        setCheckoutError("No se recibió session.id desde el backend.");
+        return;
+      }
+
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+      if (error) {
+        setCheckoutError(error.message || "No fue posible redirigir a Stripe.");
+      }
+    } catch (error) {
+      setCheckoutError(
+        error.response?.data?.msg ||
+          error.response?.data?.error ||
+          "Error al iniciar el checkout."
+      );
+    } finally {
+      setIsProcessingCheckout(false);
+    }
   };
 
   if (!cart || cart.length === 0) {
@@ -103,14 +176,20 @@ const Cart = () => {
               type="button"
               className="cart-summary-checkout"
               onClick={handleCheckout}
+              disabled={isProcessingCheckout}
             >
-              Ir a pagar
+              {isProcessingCheckout ? "Procesando..." : "Ir a pagar"}
             </button>
 
-            <p className="cart-summary-note">
-              Esta es una maqueta de demo. El flujo real de pago se conectará al
-              backend con Stripe en modo pruebas.
-            </p>
+            {checkoutError ? (
+              <p className="cart-summary-note" style={{ color: "#b91c1c" }}>
+                {checkoutError}
+              </p>
+            ) : (
+              <p className="cart-summary-note">
+                Serás redirigido a Stripe para completar el pago seguro.
+              </p>
+            )}
           </aside>
         </div>
       </div>
