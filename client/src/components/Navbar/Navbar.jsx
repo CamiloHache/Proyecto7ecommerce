@@ -69,6 +69,9 @@ const Navbar = () => {
 
           {token && (
             <>
+              <Link to="/perfil" className="nav-btn nav-btn-outline">
+                Mi perfil
+              </Link>
               <button
                 type="button"
                 className="nav-btn nav-btn-outline"
