@@ -2,7 +2,6 @@ import { useContext, useMemo, useState } from "react";
 import { CartContext } from "../context/cartContext";
 import { UserContext } from "../context/userContext";
 import { Link, useNavigate } from "react-router-dom";
-import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import "./Cart.css";
 
@@ -17,18 +16,10 @@ const Cart = () => {
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
   );
-  const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
   const handleCheckout = async () => {
     if (!token) {
       navigate("/login");
-      return;
-    }
-
-    if (!stripePublicKey) {
-      setCheckoutError(
-        "Falta configurar VITE_STRIPE_PUBLIC_KEY en el frontend."
-      );
       return;
     }
 
@@ -55,29 +46,22 @@ const Cart = () => {
         }
       );
 
-      const stripe = await loadStripe(stripePublicKey);
-
-      if (!stripe) {
-        setCheckoutError(
-          "No fue posible inicializar Stripe. Revisa la clave pública."
-        );
+      const checkoutUrl = res.data?.url;
+      if (!checkoutUrl) {
+        setCheckoutError("No se recibió la URL de checkout desde el backend.");
         return;
       }
 
-      const sessionId = res.data?.id;
-      if (!sessionId) {
-        setCheckoutError("No se recibió session.id desde el backend.");
-        return;
-      }
-
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-      if (error) {
-        setCheckoutError(error.message || "No fue posible redirigir a Stripe.");
-      }
+      window.location.assign(checkoutUrl);
     } catch (error) {
+      const status = error.response?.status;
+      const backendMsg = error.response?.data?.msg || error.response?.data?.error;
+      const networkMsg = error.message;
+
       setCheckoutError(
-        error.response?.data?.msg ||
-          error.response?.data?.error ||
+        backendMsg ||
+          (status ? `Error ${status} al iniciar checkout.` : null) ||
+          networkMsg ||
           "Error al iniciar el checkout."
       );
     } finally {

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useState } from "react";
+import { createContext, useCallback, useState } from "react";
 
 export const CartContext = createContext();
 
@@ -22,13 +22,19 @@ export const CartProvider = ({ children }) => {
     setCart(cart.filter((item) => item._id !== productId));
   };
 
+  const clearCart = useCallback(() => {
+    setCart([]);
+  }, []);
+
   const totalPrice = cart.reduce(
     (acc, item) => acc + ((item.precio || 0) * (item.quantity || 1)),
     0
   );
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, totalPrice }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, clearCart, totalPrice }}
+    >
       {children}
     </CartContext.Provider>
   );

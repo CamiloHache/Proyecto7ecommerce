@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 router.post('/', auth, async (req, res) => {
     try {
@@ -28,11 +29,11 @@ router.post('/', auth, async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: 'http://localhost:5173/success',
-            cancel_url: 'http://localhost:5173/cart',
+            success_url: `${frontendUrl}/success`,
+            cancel_url: `${frontendUrl}/cart`,
         });
 
-        res.json({ id: session.id });
+        res.json({ id: session.id, url: session.url });
     } catch (error) {
         console.error("Error en Stripe:", error);
         res.status(500).json({ error: error.message });

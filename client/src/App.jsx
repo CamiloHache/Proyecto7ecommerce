@@ -9,6 +9,7 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Perfil from "./pages/Perfil";
+import Success from "./pages/Success";
 import { UserContext } from "./context/userContext";
 import "./App.css";
 
@@ -33,6 +34,7 @@ function App() {
             <Route path="/productos" element={<Products />} />
             <Route path="/productos/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/success" element={<Success />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
