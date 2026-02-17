@@ -62,21 +62,38 @@ const Admin = () => {
   };
 
   const loadData = useCallback(async () => {
-    try {
-      const [productsRes, usersRes, ordersRes, newsRes, contactsRes] = await Promise.all([
-        axios.get(`${apiUrl}/api/admin/products`, authConfig),
-        axios.get(`${apiUrl}/api/admin/users`, authConfig),
-        axios.get(`${apiUrl}/api/admin/orders`, authConfig),
-        axios.get(`${apiUrl}/api/admin/news`, authConfig),
-        axios.get(`${apiUrl}/api/admin/contacts`, authConfig),
-      ]);
-      setProducts(productsRes.data);
-      setUsers(usersRes.data);
-      setOrders(ordersRes.data);
-      setNews(newsRes.data);
-      setContacts(contactsRes.data);
-    } catch (err) {
-      setError(err.response?.data?.msg || "No se pudieron cargar datos de administrador");
+    clearFeedback();
+
+    const requests = [
+      { key: "productos", run: () => axios.get(`${apiUrl}/api/admin/products`, authConfig) },
+      { key: "clientes", run: () => axios.get(`${apiUrl}/api/admin/users`, authConfig) },
+      { key: "ventas", run: () => axios.get(`${apiUrl}/api/admin/orders`, authConfig) },
+      { key: "noticias", run: () => axios.get(`${apiUrl}/api/admin/news`, authConfig) },
+      { key: "contactos", run: () => axios.get(`${apiUrl}/api/admin/contacts`, authConfig) },
+    ];
+
+    const results = await Promise.allSettled(requests.map((r) => r.run()));
+    const failed = [];
+
+    results.forEach((result, index) => {
+      const key = requests[index].key;
+      if (result.status === "fulfilled") {
+        const data = result.value.data || [];
+        if (key === "productos") setProducts(data);
+        if (key === "clientes") setUsers(data);
+        if (key === "ventas") setOrders(data);
+        if (key === "noticias") setNews(data);
+        if (key === "contactos") setContacts(data);
+      } else {
+        const status = result.reason?.response?.status;
+        const backendMsg = result.reason?.response?.data?.msg;
+        const detail = backendMsg || (status ? `error ${status}` : "sin respuesta");
+        failed.push(`${key}: ${detail}`);
+      }
+    });
+
+    if (failed.length > 0) {
+      setError(`No se pudo cargar: ${failed.join(" | ")}`);
     }
   }, [apiUrl, authConfig]);
 

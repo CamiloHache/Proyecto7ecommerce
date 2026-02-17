@@ -292,6 +292,11 @@
   .navbar-actions .nav-icon {
     width: 20px;
     height: 20px;
+    color: #111111;
+  }
+
+  .navbar-actions .nav-icon * {
+    stroke-width: 2.2;
   }
 
   .nav-btn-label {
