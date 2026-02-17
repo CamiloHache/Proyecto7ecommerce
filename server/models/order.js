@@ -12,6 +12,10 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+    codigoPedido: {
+      type: String,
+      default: () => `SO${Date.now().toString().slice(-4)}`,
+    },
     numeroPedido: {
       type: String,
       required: true,

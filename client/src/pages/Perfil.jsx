@@ -15,6 +15,8 @@ const Perfil = () => {
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
   );
+  const getOrderCode = (order) =>
+    order?.codigoPedido || `SO${String(order?._id || "").slice(-4).toUpperCase()}`;
 
   useEffect(() => {
     const getOrders = async () => {
@@ -87,6 +89,7 @@ const Perfil = () => {
                 <li key={order._id}>
                   <div className="perfil-order-main">
                     <span>
+                      {getOrderCode(order)} ·{" "}
                       {new Date(order.createdAt).toLocaleDateString("es-CL")} - $
                       {Number(order.total || 0).toLocaleString("es-CL")}
                     </span>
