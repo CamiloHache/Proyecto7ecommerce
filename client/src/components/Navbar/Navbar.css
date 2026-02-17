@@ -14,9 +14,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 30px 60px;
   background-color: #f6f4f1;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .navbar-logo {
@@ -27,12 +28,9 @@
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
-}
-
-.navbar-greeting {
-  font-size: 0.95rem;
-  color: #444;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 /* Botones auth */
@@ -66,10 +64,10 @@
 /* Buscador */
 .navbar-search {
   font-size: 1rem;
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 20px;
-  border: 6px solid #ccc;
-  width: 350px;
+  border: 1px solid #ccc;
+  width: 260px;
 }
 
 .search-icon {
@@ -101,7 +99,8 @@
 }
 .nav-menu {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
   background-color: #1f1f1c;
 }
@@ -112,7 +111,7 @@
   background: none;
   border: none;
   color: #f5f1e8;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 600;
   padding: 1rem 1.5rem;
   cursor: pointer;
@@ -140,7 +139,7 @@
   color: #1f1f1c;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1.5rem;
+  font-size: 1rem;
   transition: background-color 0.2s ease;
 }
 
@@ -172,4 +171,56 @@
   display: flex;
   align-items: center;  
   gap: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+  .navbar-top {
+    padding: 18px 20px;
+  }
+
+  .navbar-logo {
+    height: 62px;
+  }
+
+  .navbar-search {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navbar-actions {
+    justify-content: center;
+  }
+
+  .nav-btn.nav-btn-outline,
+  .nav-btn.outline {
+    border-width: 2px;
+    padding: 8px 12px;
+  }
+
+  .nav-link {
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .dropdown {
+    position: static;
+    min-width: auto;
+    box-shadow: none;
+  }
+
+  .nav-item:hover .dropdown {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-search {
+    width: 100%;
+  }
 }

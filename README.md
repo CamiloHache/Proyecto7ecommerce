@@ -16,6 +16,9 @@ Aplicacion fullstack de comercio electronico para Memorice. Permite registro/log
 - Checkout protegido por token
 - Redireccion a Stripe Checkout
 - Pagina de compra exitosa y limpieza automatica del carrito
+- Perfil cliente editable con historial de compras
+- Roles cliente/admin con panel administrativo
+- Modulos admin para productos, clientes, ventas y noticias
 
 ## URLs de despliegue
 
@@ -38,6 +41,12 @@ Cuando despliegues, reemplaza estos campos por las URLs reales de produccion.
 
 - `VITE_API_URL`: URL publica del backend (ej. `https://tu-api.onrender.com`)
 - `VITE_STRIPE_PUBLIC_KEY`: clave publica de Stripe en modo test (`pk_test_...`)
+
+## Roles y acceso
+
+- Registro publico crea usuarios con rol `cliente`.
+- Para habilitar un usuario administrador, cambia su campo `rol` a `admin` en MongoDB.
+- El panel admin queda disponible en la ruta `/admin` para usuarios con rol `admin`.
 
 ## Ejecucion local
 

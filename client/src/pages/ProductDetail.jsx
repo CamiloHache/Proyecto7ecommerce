@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { CartContext } from "../context/cartContext";
+import "./ProductDetail.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -9,6 +10,10 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const apiUrl = useMemo(
+    () => import.meta.env.VITE_API_URL || "http://localhost:4000",
+    []
+  );
 
   useEffect(() => {
     const getProduct = async () => {
@@ -16,8 +21,18 @@ const ProductDetail = () => {
       setError("");
 
       try {
-        const res = await axios.get(`http://localhost:4000/api/products/${id}`);
-        setProduct(res.data);
+        const res = await axios.get(`${apiUrl}/api/products/${id}`);
+        const rawProduct = res.data || {};
+        const normalizedProduct = {
+          ...rawProduct,
+          nombre: rawProduct.nombre ?? rawProduct.name ?? "",
+          precio: rawProduct.precio ?? rawProduct.price ?? 0,
+          imagen: rawProduct.imagen ?? rawProduct.image ?? "",
+          descripcion: rawProduct.descripcion ?? rawProduct.description ?? "",
+          categoria: rawProduct.categoria ?? rawProduct.category ?? "",
+          stock: rawProduct.stock ?? 0,
+        };
+        setProduct(normalizedProduct);
       } catch (err) {
         if (err.response?.status === 404) {
           setError("Producto no encontrado.");
@@ -32,7 +47,7 @@ const ProductDetail = () => {
     };
 
     getProduct();
-  }, [id]);
+  }, [apiUrl, id]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -42,7 +57,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <section style={{ padding: "2rem 1rem", maxWidth: "900px", margin: "0 auto" }}>
+      <section className="product-detail-page">
         <p>Cargando detalle del producto...</p>
       </section>
     );
@@ -50,59 +65,54 @@ const ProductDetail = () => {
 
   if (error) {
     return (
-      <section style={{ padding: "2rem 1rem", maxWidth: "900px", margin: "0 auto" }}>
+      <section className="product-detail-page">
         <h1>Detalle de producto</h1>
-        <p style={{ color: "#b91c1c" }}>{error}</p>
+        <p className="product-detail-error">{error}</p>
+        <Link to="/productos" className="product-detail-back-link">
+          Volver al menu de productos
+        </Link>
       </section>
     );
   }
 
   return (
-    <section style={{ padding: "2rem 1rem", maxWidth: "1000px", margin: "0 auto" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        {product?.nombre || "Producto sin nombre"}
-      </h1>
+    <section className="product-detail-page">
+      <div className="product-detail-header">
+        <h1>{product?.nombre || "Producto sin nombre"}</h1>
+        <Link to="/productos" className="product-detail-back-link">
+          Volver al menu de productos
+        </Link>
+      </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "1.5rem",
-          alignItems: "start",
-        }}
-      >
+      <div className="product-detail-content">
         <img
           src={product?.imagen}
           alt={product?.nombre || "Producto"}
-          style={{
-            width: "100%",
-            borderRadius: "12px",
-            objectFit: "cover",
-            maxHeight: "420px",
-          }}
+          className="product-detail-image"
         />
 
-        <div>
-          <p style={{ fontSize: "1.25rem", fontWeight: "700", marginBottom: "1rem" }}>
+        <div className="product-detail-info">
+          <p className="product-detail-price">
             ${Number(product?.precio || 0).toLocaleString("es-CL")}
           </p>
-          <p style={{ marginBottom: "1.2rem", color: "#374151", lineHeight: 1.6 }}>
+          <p className="product-detail-description">
             {product?.descripcion || "Sin descripción disponible."}
           </p>
+          <ul className="product-detail-meta">
+            <li>
+              <strong>Categoria:</strong> {product?.categoria || "Sin categoria"}
+            </li>
+          </ul>
           <button
             type="button"
             onClick={handleAddToCart}
-            style={{
-              backgroundColor: "#111827",
-              color: "#fff",
-              border: "none",
-              borderRadius: "999px",
-              padding: "0.7rem 1.2rem",
-              cursor: "pointer",
-            }}
+            className="product-detail-add-btn"
           >
             Añadir al carrito
           </button>
+          <Link to="/productos" className="product-detail-continue-link">
+            Seguir mirando
+          </Link>
         </div>
       </div>
     </section>

@@ -16,12 +16,6 @@ const Navbar = () => {
         </Link>
 
         <div className="navbar-actions">
-          {token && (
-            <span className="navbar-greeting">
-              Hola {user?.nombre || "usuario"}
-            </span>
-          )}
-
           <Link to="/cart" className="nav-btn nav-btn-outline">
             <span
               style={{
@@ -56,41 +50,35 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {!token && (
-            <>
-              <Link to="/login" className="nav-btn nav-btn-outline">
-                Login
-              </Link>
-              <Link to="/signup" className="nav-btn nav-btn-outline">
-                Sign up
-              </Link>
-            </>
+          <button
+            type="button"
+            className="nav-btn nav-btn-outline"
+            onClick={() => navigate(token ? "/perfil" : "/login")}
+          >
+            {token ? `Hola ${user?.nombre || "usuario"}` : "Login"}
+          </button>
+
+          {!token ? (
+            <Link to="/signup" className="nav-btn nav-btn-outline">
+              Sign up
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="nav-btn nav-btn-outline"
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
+              Logout
+            </button>
           )}
 
-          {token && (
-            <>
-              <Link to="/perfil" className="nav-btn nav-btn-outline">
-                Mi perfil
-              </Link>
-              <button
-                type="button"
-                className="nav-btn nav-btn-outline"
-                disabled
-                style={{ opacity: 0.6, cursor: "default" }}
-              >
-                Registrado
-              </button>
-              <button
-                type="button"
-                className="nav-btn nav-btn-outline"
-                onClick={() => {
-                  logout();
-                  navigate("/");
-                }}
-              >
-                Logout
-              </button>
-            </>
+          {user?.rol === "admin" && (
+            <Link to="/admin" className="nav-btn nav-btn-outline">
+              Panel admin
+            </Link>
           )}
           <input
             type="text"

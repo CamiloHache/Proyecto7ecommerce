@@ -18,6 +18,20 @@ API backend del proyecto Memorice eCommerce.
 ### Checkout
 - **POST** `/api/checkout`: crea sesion de Stripe (ruta protegida por JWT)
 
+### Usuario autenticado
+- **GET** `/api/users/me`: obtiene perfil del usuario
+- **PUT** `/api/users/me`: actualiza nombre/email del usuario
+- **GET** `/api/users/me/orders`: lista compras del usuario
+
+### Admin (rol `admin`)
+- **GET/POST/PUT/DELETE** `/api/admin/products...`: gestion de catalogo y stock
+- **GET/PUT** `/api/admin/users...`: gestion de clientes y roles
+- **GET/PUT** `/api/admin/orders...`: revision y procesamiento de ventas + nota de contacto
+- **GET/POST/PUT/DELETE** `/api/admin/news...`: gestion de noticias
+
+### Noticias públicas
+- **GET** `/api/news`: lista noticias publicadas
+
 ## Variables de entorno (`server/.env`)
 
 - `PORT`: puerto del servidor

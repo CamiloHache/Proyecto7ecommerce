@@ -25,4 +25,9 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_xxx
 - Output directory: `dist`
 - Variables requeridas: `VITE_API_URL`, `VITE_STRIPE_PUBLIC_KEY`
 
+## Rutas relevantes
+
+- `/perfil`: perfil del cliente y edicion de datos
+- `/admin`: panel administrativo (solo rol `admin`)
+
 Para documentacion completa del proyecto revisar el `README.md` de la raiz.

@@ -6,6 +6,9 @@ require('dotenv').config();
 // 1. Importación de Rutas
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const newsRoutes = require('./routes/newsRoutes');
 
 const app = express();
 
@@ -21,6 +24,9 @@ mongoose.connect(process.env.MONGODB_URI)
 // 4. Definición de Rutas
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/news', newsRoutes);
 const checkoutRoutes = require('./routes/checkoutRoutes');
 
 // Usar la ruta

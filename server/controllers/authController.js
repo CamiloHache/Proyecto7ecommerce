@@ -15,7 +15,12 @@ exports.registerUser = async (req, res) => {
         }
 
         // 2. Crear el nuevo usuario
-        user = new User(req.body);
+        user = new User({
+            nombre,
+            email,
+            password,
+            rol: "cliente",
+        });
 
         // 3. Encriptar la contraseña
         const salt = await bcryptjs.genSalt(10);

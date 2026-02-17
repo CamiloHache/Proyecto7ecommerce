@@ -33,6 +33,7 @@
   height: 56px;
   margin-bottom: 12px;
   display: block;
+  filter: brightness(0) invert(1);
 }
 
 .footer-tagline {

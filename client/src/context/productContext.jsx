@@ -1,16 +1,20 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const apiUrl = useMemo(
+    () => import.meta.env.VITE_API_URL || "http://localhost:4000",
+    []
+  );
 
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/products");
+        const res = await axios.get(`${apiUrl}/api/products`);
         const normalizedProducts = res.data.map((product) => ({
           ...product,
           nombre: product.nombre ?? product.name ?? "",
@@ -23,7 +27,7 @@ export const ProductProvider = ({ children }) => {
       }
     };
     getProducts();
-  }, []);
+  }, [apiUrl]);
 
   return (
     <ProductContext.Provider value={{ products }}>

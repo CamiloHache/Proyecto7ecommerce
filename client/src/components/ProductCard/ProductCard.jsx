@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { CartContext } from "../../context/cartContext"; 
 
 const ProductCard = ({ product }) => {
@@ -8,14 +9,19 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="border border-gray-200 rounded-lg shadow-lg p-4 flex flex-col items-center bg-white transition hover:shadow-xl">
-      <img 
-        src={product.imagen} 
-        alt={product.nombre} 
-        className="w-full h-48 object-cover rounded-md mb-4" 
-      />
-      <h3 className="text-lg font-bold text-gray-800">{product.nombre}</h3>
-      <p className="text-gray-600 mb-4">${product.precio?.toLocaleString()}</p>
-      
+      <Link
+        to={`/productos/${product._id}`}
+        className="w-full text-center no-underline"
+      >
+        <img
+          src={product.imagen}
+          alt={product.nombre}
+          className="w-full h-48 object-cover rounded-md mb-4"
+        />
+        <h3 className="text-lg font-bold text-gray-800">{product.nombre}</h3>
+        <p className="text-gray-600 mb-4">${product.precio?.toLocaleString()}</p>
+      </Link>
+
       <button 
         onClick={() => {
           addToCart(product);

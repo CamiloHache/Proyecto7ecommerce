@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Perfil from "./pages/Perfil";
 import Success from "./pages/Success";
+import Admin from "./pages/Admin";
 import { UserContext } from "./context/userContext";
 import "./App.css";
 
@@ -20,6 +21,13 @@ const PrivateRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
+  return children;
+};
+
+const AdminRoute = ({ children }) => {
+  const { token, user } = useContext(UserContext);
+  if (!token) return <Navigate to="/login" replace />;
+  if (user?.rol !== "admin") return <Navigate to="/" replace />;
   return children;
 };
 
@@ -43,6 +51,14 @@ function App() {
                 <PrivateRoute>
                   <Perfil />
                 </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
               }
             />
           </Routes>

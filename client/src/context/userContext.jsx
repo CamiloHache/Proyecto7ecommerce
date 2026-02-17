@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 import axios from "axios";
 
 export const UserContext = createContext();
@@ -9,10 +9,13 @@ export const UserProvider = ({ children }) => {
     () => JSON.parse(localStorage.getItem("user") || "null")
   );
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-
+  const apiUrl = useMemo(
+    () => import.meta.env.VITE_API_URL || "http://localhost:4000",
+    []
+  );
   const login = async (email, password) => {
     try {
-      const res = await axios.post("http://localhost:4000/api/auth/login", {
+      const res = await axios.post(`${apiUrl}/api/auth/login`, {
         email,
         password,
       });
@@ -42,7 +45,7 @@ export const UserProvider = ({ children }) => {
 
   const register = async (nombre, email, password) => {
     try {
-      await axios.post("http://localhost:4000/api/auth/register", {
+      await axios.post(`${apiUrl}/api/auth/register`, {
         nombre,
         email,
         password,
@@ -60,8 +63,43 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  const refreshProfile = async (customToken) => {
+    try {
+      const res = await axios.get(`${apiUrl}/api/users/me`, {
+        headers: { "x-auth-token": customToken || token },
+      });
+      const userData = {
+        id: res.data._id || res.data.id,
+        nombre: res.data.nombre || "Usuario",
+        email: res.data.email || "",
+        rol: res.data.rol || "cliente",
+      };
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return { success: true, user: userData };
+    } catch {
+      return { success: false, msg: "No fue posible actualizar el perfil" };
+    }
+  };
+
+  const updateProfile = async (payload) => {
+    try {
+      const res = await axios.put(`${apiUrl}/api/users/me`, payload, {
+        headers: { "x-auth-token": token },
+      });
+      const userData = res.data.user;
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return { success: true };
+    } catch (error) {
+      return { success: false, msg: error.response?.data?.msg || "No se pudo actualizar perfil" };
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, token, login, logout, register }}>
+    <UserContext.Provider
+      value={{ user, token, login, logout, register, refreshProfile, updateProfile }}
+    >
       {children}
     </UserContext.Provider>
   );

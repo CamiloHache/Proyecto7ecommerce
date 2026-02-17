@@ -2,11 +2,33 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
 
+const normalizeProduct = (productDoc) => {
+    const p = productDoc?.toObject ? productDoc.toObject() : productDoc;
+    return {
+        ...p,
+        nombre: p?.nombre ?? p?.name ?? "",
+        precio: p?.precio ?? p?.price ?? 0,
+        imagen: p?.imagen ?? p?.image ?? "",
+        descripcion: p?.descripcion ?? p?.description ?? "",
+        categoria: p?.categoria ?? p?.category ?? "",
+        stock: p?.stock ?? 0,
+    };
+};
+
+const mapPayloadToProduct = (body = {}) => ({
+    nombre: body.nombre ?? body.name,
+    descripcion: body.descripcion ?? body.description,
+    precio: body.precio ?? body.price,
+    imagen: body.imagen ?? body.image,
+    stock: body.stock,
+    categoria: body.categoria ?? body.category,
+});
+
 // GET todos los productos
 router.get('/', async (req, res) => {
     try {
         const products = await Product.find();
-        res.json(products);
+        res.json(products.map(normalizeProduct));
     } catch (error) {
         res.status(500).json({ message: "Error al obtener productos" });
     }
@@ -21,7 +43,7 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ message: "Producto no encontrado" });
         }
 
-        res.json(product);
+        res.json(normalizeProduct(product));
     } catch (error) {
         if (error.name === 'CastError') {
             return res.status(400).json({ message: "ID de producto no válido" });
@@ -33,9 +55,9 @@ router.get('/:id', async (req, res) => {
 // POST crear producto
 router.post('/', async (req, res) => {
     try {
-        const newProduct = new Product(req.body);
+        const newProduct = new Product(mapPayloadToProduct(req.body));
         const savedProduct = await newProduct.save();
-        res.status(201).json(savedProduct);
+        res.status(201).json(normalizeProduct(savedProduct));
     } catch (error) {
         res.status(400).json({ message: "Error al crear el producto", error });
     }
@@ -46,7 +68,7 @@ router.put('/:id', async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            mapPayloadToProduct(req.body),
             { new: true, runValidators: true }
         );
 
@@ -54,7 +76,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: "Producto no encontrado" });
         }
 
-        res.json(updatedProduct);
+        res.json(normalizeProduct(updatedProduct));
     } catch (error) {
         if (error.name === 'CastError') {
             return res.status(400).json({ message: "ID de producto no válido" });

@@ -184,3 +184,18 @@
   background: #555;
   transform: translate(-50%, -50%) rotate(-35deg);
 }
+
+@media (max-width: 520px) {
+  .login-page {
+    padding: 24px 12px;
+  }
+
+  .login-card {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .login-logo {
+    height: 52px;
+  }
+}

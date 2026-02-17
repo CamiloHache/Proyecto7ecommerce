@@ -29,3 +29,21 @@
   gap: 36px;
   justify-content: space-evenly;
 }
+
+@media (max-width: 768px) {
+  .products-page {
+    padding: 36px 16px;
+  }
+
+  .products-page h1 {
+    font-size: 1.4rem;
+  }
+
+  .products-page-intro {
+    margin-bottom: 24px;
+  }
+
+  .products-page .products-grid {
+    gap: 18px;
+  }
+}
