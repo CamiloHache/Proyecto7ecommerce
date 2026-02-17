@@ -39,6 +39,7 @@ const Footer = () => {
 
       <div className="footer-bottom">
         <p>© {new Date().getFullYear()} Memorice. Todos los derechos reservados.</p>
+        <p className="footer-credit">Desarrollado por Tiúke Studio</p>
       </div>
     </footer>
   );

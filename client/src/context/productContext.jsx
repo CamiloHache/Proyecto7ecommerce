@@ -6,6 +6,8 @@ export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState("");
   const apiUrl = useMemo(
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
@@ -13,6 +15,8 @@ export const ProductProvider = ({ children }) => {
 
   useEffect(() => {
     const getProducts = async () => {
+      setLoadingProducts(true);
+      setProductsError("");
       try {
         const res = await axios.get(`${apiUrl}/api/products`);
         const normalizedProducts = res.data.map((product) => ({
@@ -24,13 +28,19 @@ export const ProductProvider = ({ children }) => {
         setProducts(normalizedProducts);
       } catch (error) {
         console.error("Error obteniendo productos:", error);
+        setProducts([]);
+        setProductsError(
+          "Estamos presentando intermitencias en el servicio. Si deseas hacer tu pedido, escríbenos a contacto@memorice.cl y te ayudamos de inmediato."
+        );
+      } finally {
+        setLoadingProducts(false);
       }
     };
     getProducts();
   }, [apiUrl]);
 
   return (
-    <ProductContext.Provider value={{ products }}>
+    <ProductContext.Provider value={{ products, loadingProducts, productsError }}>
       {children}
     </ProductContext.Provider>
   );

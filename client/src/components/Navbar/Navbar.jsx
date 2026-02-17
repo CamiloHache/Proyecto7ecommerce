@@ -1,6 +1,6 @@
 import "./Navbar.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../../context/userContext";
 import logo from "../../assets/img/logo-blk3.png";
 
@@ -58,6 +58,18 @@ const LogoutIcon = () => (
   </svg>
 );
 
+const AdminIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
+    <path
+      d="M12 3l7 3v6c0 4.3-2.9 7.9-7 9-4.1-1.1-7-4.7-7-9V6l7-3z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const SearchIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon nav-search-icon">
     <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -71,35 +83,77 @@ const SearchIcon = () => (
   </svg>
 );
 
+const MenuIcon = ({ isOpen }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
+    {isOpen ? (
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    ) : (
+      <path
+        d="M4 7h16M4 12h16M4 17h16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    )}
+  </svg>
+);
+
 const Navbar = () => {
   const { token, user, logout } = useContext(UserContext);
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const closeMobileMenu = () => setIsMenuOpen(false);
 
   return (
     <header className="navbar-header">
       <div className="navbar-top">
-        <Link to="/">
-          <img src={logo} alt="Memorice logo" className="navbar-logo" />
-        </Link>
+        <div className="navbar-brand-row">
+          <Link to="/" onClick={closeMobileMenu} className="navbar-logo-link">
+            <img src={logo} alt="Memorice logo" className="navbar-logo" />
+          </Link>
+          <button
+            type="button"
+            className="navbar-menu-toggle"
+            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+          >
+            <MenuIcon isOpen={isMenuOpen} />
+          </button>
+        </div>
 
         <div className="navbar-actions">
-          <Link to="/cart" className="nav-btn nav-btn-outline">
+          <Link to="/cart" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
             <CartIcon />
-            <span>Carrito</span>
+            <span className="nav-btn-label">Carrito</span>
           </Link>
 
           <button
             type="button"
             className="nav-btn nav-btn-outline"
-            onClick={() => navigate(token ? "/perfil" : "/login")}
+            onClick={() => {
+              closeMobileMenu();
+              navigate(token ? "/perfil" : "/login");
+            }}
+            aria-label={token ? "Ir a perfil" : "Ir a login"}
           >
             {token ? <UserIcon /> : <LoginIcon />}
-            {token ? `Hola ${user?.nombre || "usuario"}` : "Login"}
+            <span className="nav-btn-label">
+              {token ? `Hola ${user?.nombre || "usuario"}` : "Login"}
+            </span>
           </button>
 
           {!token ? (
-            <Link to="/signup" className="nav-btn nav-btn-outline">
-              Sign up
+            <Link to="/signup" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
+              <span className="nav-btn-label">Sign up</span>
             </Link>
           ) : (
             <button
@@ -107,17 +161,20 @@ const Navbar = () => {
               className="nav-btn nav-btn-outline"
               onClick={() => {
                 logout();
+                closeMobileMenu();
                 navigate("/");
               }}
+              aria-label="Cerrar sesión"
             >
               <LogoutIcon />
-              Logout
+              <span className="nav-btn-label">Logout</span>
             </button>
           )}
 
           {user?.rol === "admin" && (
-            <Link to="/admin" className="nav-btn nav-btn-outline">
-              Panel admin
+            <Link to="/admin" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
+              <AdminIcon />
+              <span className="nav-btn-label">Panel admin</span>
             </Link>
           )}
           <div className="navbar-search-wrap">
@@ -131,38 +188,54 @@ const Navbar = () => {
         </div>
       </div>
 
-      <nav className="nav-menu">
+      <nav className={`nav-menu ${isMenuOpen ? "is-open" : ""}`}>
         <div className="nav-item">
           <span className="nav-link">QUIÉNES SOMOS</span>
           <div className="dropdown">
-            <Link to="/proyecto-memorice">Proyecto Memorice</Link>
-            <a href="/#proyecto">Definición, Misión, Visión, Valores</a>
+            <Link to="/proyecto-memorice" onClick={closeMobileMenu}>
+              Proyecto Memorice
+            </Link>
+            <a href="/#proyecto" onClick={closeMobileMenu}>
+              Definición, Misión, Visión, Valores
+            </a>
           </div>
         </div>
 
         <div className="nav-item">
           <span className="nav-link">COLABORACIONES</span>
           <div className="dropdown">
-            <Link to="/colaboraciones/mmdh">MMDH</Link>
-            <Link to="/colaboraciones/sitios-memoria">Sitios de Memoria</Link>
-            <Link to="/colaboraciones/argentina">Argentina</Link>
+            <Link to="/colaboraciones/mmdh" onClick={closeMobileMenu}>
+              MMDH
+            </Link>
+            <Link to="/colaboraciones/sitios-memoria" onClick={closeMobileMenu}>
+              Sitios de Memoria
+            </Link>
+            <Link to="/colaboraciones/argentina" onClick={closeMobileMenu}>
+              Argentina
+            </Link>
           </div>
         </div>
 
         <div className="nav-item">
-          <Link to="/productos" className="nav-link">
+          <Link to="/productos" className="nav-link" onClick={closeMobileMenu}>
             PRODUCTOS
           </Link>
           <div className="dropdown">
-            <Link to="/productos">Ver catálogo</Link>
+            <Link to="/productos" onClick={closeMobileMenu}>
+              Ver catálogo
+            </Link>
           </div>
         </div>
 
         <div className="nav-item">
           <span className="nav-link">CONTACTO</span>
           <div className="dropdown">
-            <Link to="/contacto">Formulario</Link>
-            <Link to="/prensa">Prensa</Link>
+            <Link to="/contacto" onClick={closeMobileMenu}>
+              Formulario
+            </Link>
+            <Link to="/prensa" onClick={closeMobileMenu}>
+              Prensa
+            </Link>
           </div>
         </div>
 

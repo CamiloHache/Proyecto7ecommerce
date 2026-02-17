@@ -27,7 +27,7 @@ const proyectoBlocks = [
 ];
 
 const Home = () => {
-  const { products } = useContext(ProductContext);
+  const { products, loadingProducts, productsError } = useContext(ProductContext);
 
   return (
     <>
@@ -40,7 +40,11 @@ const Home = () => {
           <h2>Productos destacados</h2>
           <div className="products-grid">
             {}
-            {products && products.length > 0 ? (
+            {loadingProducts ? (
+              <p className="col-span-full text-center py-10">Cargando productos de memoria...</p>
+            ) : productsError ? (
+              <p className="col-span-full text-center py-10">{productsError}</p>
+            ) : products && products.length > 0 ? (
               products.slice(0, 3).map((product) => (
                 <ProductCard
                   key={product._id}
@@ -48,7 +52,7 @@ const Home = () => {
                 />
               ))
             ) : (
-              <p className="col-span-full text-center py-10">Cargando productos de memoria...</p>
+              <p className="col-span-full text-center py-10">No hay productos cargados todavía.</p>
             )}
           </div>
           <Link to="/productos" className="home-products-link">

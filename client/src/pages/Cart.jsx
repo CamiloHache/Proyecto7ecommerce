@@ -8,7 +8,7 @@ import "./Cart.css";
 const Cart = () => {
   const navigate = useNavigate();
   const { cart, removeFromCart, totalPrice } = useContext(CartContext);
-  const { token } = useContext(UserContext);
+  const { token, logout } = useContext(UserContext);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
@@ -57,6 +57,15 @@ const Cart = () => {
       const status = error.response?.status;
       const backendMsg = error.response?.data?.msg || error.response?.data?.error;
       const networkMsg = error.message;
+
+      if (status === 401) {
+        logout();
+        setCheckoutError(
+          "Tu sesión expiró o ya no es válida. Por favor inicia sesión nuevamente para continuar con tu compra."
+        );
+        navigate("/login");
+        return;
+      }
 
       setCheckoutError(
         backendMsg ||

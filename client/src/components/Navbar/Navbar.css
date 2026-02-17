@@ -21,8 +21,33 @@
   border-bottom: 2px solid #1f1f1c;
 }
 
+.navbar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.navbar-logo-link {
+  display: inline-flex;
+  align-items: center;
+}
+
 .navbar-logo {
   height: 80px;
+}
+
+.navbar-menu-toggle {
+  display: none;
+  border: 2px solid #1f1f1c;
+  background: #fff;
+  color: #1f1f1c;
+  border-radius: 8px;
+  min-width: 42px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 /* Acciones derecha */
@@ -230,14 +255,49 @@
     align-items: stretch;
   }
 
+  .navbar-brand-row {
+    width: 100%;
+  }
+
+  .navbar-logo-link {
+    width: calc(100% - 54px);
+  }
+
+  .navbar-logo {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: 72px;
+    object-fit: contain;
+  }
+
+  .navbar-menu-toggle {
+    display: inline-flex;
+  }
+
   .navbar-actions {
     justify-content: center;
+    gap: 8px;
   }
 
   .nav-btn.nav-btn-outline,
   .nav-btn.outline {
-    min-width: 114px;
-    padding: 8px 10px;
+    min-width: 40px;
+    width: 40px;
+    min-height: 40px;
+    padding: 6px;
+    border-radius: 10px;
+  }
+
+  .nav-btn-label {
+    display: none;
+  }
+
+  .navbar-search-wrap {
+    flex: 1;
+    min-width: 130px;
+    max-width: 260px;
+    min-height: 40px;
   }
 
   .nav-link {
@@ -248,9 +308,14 @@
   }
 
   .nav-menu {
+    display: none;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
+  }
+
+  .nav-menu.is-open {
+    display: flex;
   }
 
   .nav-item {

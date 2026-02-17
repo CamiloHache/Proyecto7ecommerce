@@ -4,7 +4,7 @@ import ProductCard from "../components/ProductCard/ProductCard";
 import "./Products.css";
 
 const ProductsPage = () => {
-  const { products } = useContext(ProductContext);
+  const { products, loadingProducts, productsError } = useContext(ProductContext);
 
   return (
     <section className="products-page">
@@ -14,7 +14,11 @@ const ProductsPage = () => {
           Objetos y diseños que conectan memoria, arte y cultura.
         </p>
         <div className="products-grid">
-          {products && products.length > 0 ? (
+          {loadingProducts ? (
+            <p className="text-center py-10">Cargando catálogo...</p>
+          ) : productsError ? (
+            <p className="text-center py-10">{productsError}</p>
+          ) : products && products.length > 0 ? (
             products.map((p) => (
               <ProductCard
                 key={p._id}
@@ -22,7 +26,7 @@ const ProductsPage = () => {
               />
             ))
           ) : (
-            <p className="text-center py-10">Cargando catálogo...</p>
+            <p className="text-center py-10">No hay productos disponibles por ahora.</p>
           )}
         </div>
       </div>
