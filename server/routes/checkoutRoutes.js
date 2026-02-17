@@ -4,10 +4,13 @@ const auth = require('../middleware/auth');
 const Order = require('../models/order');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 router.post('/', auth, async (req, res) => {
     try {
+        const frontendUrl =
+            req.headers.origin ||
+            process.env.FRONTEND_URL ||
+            "http://localhost:5173";
         const { products } = req.body;
         if (!Array.isArray(products) || products.length === 0) {
             return res.status(400).json({ msg: "El carrito no puede estar vacío" });

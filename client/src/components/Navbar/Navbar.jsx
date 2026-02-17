@@ -70,6 +70,19 @@ const AdminIcon = () => (
   </svg>
 );
 
+const SignupIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
+    <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    <path
+      d="M3.5 19a5.5 5.5 0 0 1 11 0M17 8v6M14 11h6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 const SearchIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon nav-search-icon">
     <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -153,6 +166,7 @@ const Navbar = () => {
 
           {!token ? (
             <Link to="/signup" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
+              <SignupIcon />
               <span className="nav-btn-label">Sign up</span>
             </Link>
           ) : (

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
+const auth = require("../middleware/auth");
+const authorizeRole = require("../middleware/authorizeRole");
 
 const normalizeProduct = (productDoc) => {
     const p = productDoc?.toObject ? productDoc.toObject() : productDoc;
@@ -53,7 +55,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST crear producto
-router.post('/', async (req, res) => {
+router.post('/', auth, authorizeRole("admin"), async (req, res) => {
     try {
         const newProduct = new Product(mapPayloadToProduct(req.body));
         const savedProduct = await newProduct.save();
@@ -64,7 +66,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT actualizar producto por id
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, authorizeRole("admin"), async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
@@ -86,7 +88,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE eliminar producto por id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, authorizeRole("admin"), async (req, res) => {
     try {
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);
 

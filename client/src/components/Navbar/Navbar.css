@@ -289,6 +289,11 @@
     border-radius: 10px;
   }
 
+  .navbar-actions .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+
   .nav-btn-label {
     display: none;
   }

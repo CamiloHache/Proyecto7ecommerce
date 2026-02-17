@@ -100,3 +100,42 @@
 .signup-link:hover {
   text-decoration: underline;
 }
+
+.password-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-field input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.password-toggle {
+  width: 64px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid #d2cec6;
+  background: #f8f6f1;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  background: #ece7dc;
+}
+
+@media (max-width: 520px) {
+  .signup-page {
+    padding: 24px 12px;
+  }
+
+  .signup-card {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .signup-logo {
+    height: 52px;
+  }
+}

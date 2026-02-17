@@ -69,7 +69,7 @@ const ProductDetail = () => {
         <h1>Detalle de producto</h1>
         <p className="product-detail-error">{error}</p>
         <Link to="/productos" className="product-detail-back-link">
-          Volver al menu de productos
+          Volver al catalogo
         </Link>
       </section>
     );
@@ -80,7 +80,7 @@ const ProductDetail = () => {
       <div className="product-detail-header">
         <h1>{product?.nombre || "Producto sin nombre"}</h1>
         <Link to="/productos" className="product-detail-back-link">
-          Volver al menu de productos
+          Volver al catalogo
         </Link>
       </div>
 
@@ -111,7 +111,7 @@ const ProductDetail = () => {
             Añadir al carrito
           </button>
           <Link to="/productos" className="product-detail-continue-link">
-            Seguir mirando
+            Seguir comprando
           </Link>
         </div>
       </div>

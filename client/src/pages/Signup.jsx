@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 import logo from "../assets/img/logo-blk3.png";
-import "./Login.css"; 
+import "./Signup.css";
 
 const Signup = () => {
   const [nombre, setNombre] = useState("");
@@ -40,16 +40,16 @@ const Signup = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <Link to="/" className="login-logo-wrap">
-          <img src={logo} alt="Logo" className="login-logo" />
+    <div className="signup-page">
+      <div className="signup-card">
+        <Link to="/" className="signup-logo-wrap">
+          <img src={logo} alt="Logo" className="signup-logo" />
         </Link>
         <h1>Crear cuenta</h1>
-        <p className="login-intro">
+        <p className="signup-intro">
           Regístrate para acceder a tu perfil, pedidos y contenido exclusivo.
         </p>
-        <form className="login-form" onSubmit={handleSubmit}>
+        <form className="signup-form" onSubmit={handleSubmit}>
           {error && (
             <p
               style={{
@@ -116,10 +116,16 @@ const Signup = () => {
             </button>
           </div>
 
-          <button type="submit" className="login-submit">
+          <button type="submit" className="signup-submit">
             Registrarme
           </button>
         </form>
+        <p className="signup-footer">
+          ¿Ya tienes cuenta?{" "}
+          <Link to="/login" className="signup-link">
+            Inicia sesión
+          </Link>
+        </p>
       </div>
     </div>
   );

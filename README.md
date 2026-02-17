@@ -47,6 +47,15 @@ Cuando despliegues, reemplaza estos campos por las URLs reales de produccion.
 - Registro publico crea usuarios con rol `cliente`.
 - Para habilitar un usuario administrador, cambia su campo `rol` a `admin` en MongoDB.
 - El panel admin queda disponible en la ruta `/admin` para usuarios con rol `admin`.
+- Las operaciones sensibles de catalogo (crear/editar/eliminar) requieren token valido y rol `admin`.
+
+## Checklist de validacion por hito
+
+- Cliente no autenticado: no accede a `/perfil` ni `/admin`.
+- Cliente autenticado: ve navbar contextual (`Hola <nombre>`), puede comprar y ver historial en perfil.
+- Admin autenticado: accede a `/admin` y puede gestionar productos, clientes, ventas, noticias y contactos.
+- Frontend: todas las llamadas HTTP usan `VITE_API_URL` como base.
+- Calidad minima: correr `npm run lint` y `npm run build` en `client` antes de desplegar.
 
 ## Ejecucion local
 
