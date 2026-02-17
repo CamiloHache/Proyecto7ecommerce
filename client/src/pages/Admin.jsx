@@ -42,6 +42,7 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [news, setNews] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -50,6 +51,7 @@ const Admin = () => {
 
   const [editingUser, setEditingUser] = useState({});
   const [editingOrder, setEditingOrder] = useState({});
+  const [editingContact, setEditingContact] = useState({});
 
   const [newsForm, setNewsForm] = useState(initialNews);
   const [editingNewsId, setEditingNewsId] = useState("");
@@ -61,16 +63,18 @@ const Admin = () => {
 
   const loadData = useCallback(async () => {
     try {
-      const [productsRes, usersRes, ordersRes, newsRes] = await Promise.all([
+      const [productsRes, usersRes, ordersRes, newsRes, contactsRes] = await Promise.all([
         axios.get(`${apiUrl}/api/admin/products`, authConfig),
         axios.get(`${apiUrl}/api/admin/users`, authConfig),
         axios.get(`${apiUrl}/api/admin/orders`, authConfig),
         axios.get(`${apiUrl}/api/admin/news`, authConfig),
+        axios.get(`${apiUrl}/api/admin/contacts`, authConfig),
       ]);
       setProducts(productsRes.data);
       setUsers(usersRes.data);
       setOrders(ordersRes.data);
       setNews(newsRes.data);
+      setContacts(contactsRes.data);
     } catch (err) {
       setError(err.response?.data?.msg || "No se pudieron cargar datos de administrador");
     }
@@ -194,6 +198,17 @@ const Admin = () => {
     }
   };
 
+  const saveContact = async (id) => {
+    clearFeedback();
+    try {
+      await axios.put(`${apiUrl}/api/admin/contacts/${id}`, editingContact[id], authConfig);
+      setMessage("Contacto actualizado.");
+      loadData();
+    } catch {
+      setError("No se pudo actualizar el contacto");
+    }
+  };
+
   return (
     <section className="admin-page">
       <h1>Panel administrador</h1>
@@ -202,7 +217,7 @@ const Admin = () => {
       </p>
 
       <div className="admin-tabs">
-        {["productos", "clientes", "ventas", "noticias"].map((tab) => (
+        {["productos", "clientes", "ventas", "noticias", "contactos"].map((tab) => (
           <button
             key={tab}
             type="button"
@@ -438,6 +453,54 @@ const Admin = () => {
               ))}
             </ul>
           </div>
+        </div>
+      ) : null}
+
+      {activeTab === "contactos" ? (
+        <div className="admin-card">
+          <h2>Mensajes de contacto</h2>
+          <ul className="admin-list">
+            {contacts.map((c) => (
+              <li key={c._id}>
+                <div>
+                  <strong>
+                    {c.nombre} ({c.email})
+                  </strong>
+                  <span>{new Date(c.createdAt).toLocaleString("es-CL")}</span>
+                  <p>{c.mensaje}</p>
+                </div>
+                <div className="admin-order-controls">
+                  <select
+                    value={editingContact[c._id]?.estado ?? c.estado}
+                    onChange={(e) =>
+                      setEditingContact((prev) => ({
+                        ...prev,
+                        [c._id]: { ...prev[c._id], estado: e.target.value },
+                      }))
+                    }
+                  >
+                    <option value="nuevo">nuevo</option>
+                    <option value="en_revision">en revisión</option>
+                    <option value="respondido">respondido</option>
+                    <option value="cerrado">cerrado</option>
+                  </select>
+                  <input
+                    placeholder="Respuesta/nota"
+                    value={editingContact[c._id]?.respuestaAdmin ?? c.respuestaAdmin ?? ""}
+                    onChange={(e) =>
+                      setEditingContact((prev) => ({
+                        ...prev,
+                        [c._id]: { ...prev[c._id], respuestaAdmin: e.target.value },
+                      }))
+                    }
+                  />
+                  <button type="button" onClick={() => saveContact(c._id)}>
+                    Guardar
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
     </section>

@@ -245,3 +245,41 @@
   color: #ffffff;
 }
 
+@media (max-width: 640px) {
+  .cart-page {
+    padding: 32px 12px;
+  }
+
+  .cart-title {
+    font-size: 1.5rem;
+    margin-bottom: 18px;
+  }
+
+  .cart-items,
+  .cart-summary {
+    padding: 14px 12px;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .cart-item-info {
+    align-items: flex-start;
+  }
+
+  .cart-item-price {
+    align-items: flex-start;
+  }
+
+  .cart-summary-discount-input {
+    flex-direction: column;
+  }
+
+  .cart-empty-box {
+    padding: 24px 18px;
+  }
+}
+

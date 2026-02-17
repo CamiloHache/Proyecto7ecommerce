@@ -1,0 +1,52 @@
+.contact-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.contact-page h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+}
+
+.contact-intro {
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.contact-form {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 0.95rem;
+}
+
+.contact-form button {
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.contact-ok {
+  color: #166534;
+  margin: 0;
+}
+
+.contact-error {
+  color: #b91c1c;
+  margin: 0;
+}

@@ -11,6 +11,10 @@ import Signup from "./pages/Signup";
 import Perfil from "./pages/Perfil";
 import Success from "./pages/Success";
 import Admin from "./pages/Admin";
+import ProyectoMemorice from "./pages/ProyectoMemorice";
+import ColaboracionDetalle from "./pages/ColaboracionDetalle";
+import Contacto from "./pages/Contacto";
+import Prensa from "./pages/Prensa";
 import { UserContext } from "./context/userContext";
 import "./App.css";
 
@@ -43,6 +47,10 @@ function App() {
             <Route path="/productos/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/success" element={<Success />} />
+            <Route path="/proyecto-memorice" element={<ProyectoMemorice />} />
+            <Route path="/colaboraciones/:slug" element={<ColaboracionDetalle />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="/prensa" element={<Prensa />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route

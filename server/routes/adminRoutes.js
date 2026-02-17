@@ -6,6 +6,7 @@ const Product = require("../models/product");
 const User = require("../models/user");
 const Order = require("../models/order");
 const News = require("../models/news");
+const Contact = require("../models/contact");
 
 router.use(auth, authorizeRole("admin"));
 
@@ -179,6 +180,32 @@ router.delete("/news/:id", async (req, res) => {
     res.json({ msg: "Noticia eliminada" });
   } catch (error) {
     res.status(500).json({ msg: "Error al eliminar noticia" });
+  }
+});
+
+router.get("/contacts", async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener contactos" });
+  }
+});
+
+router.put("/contacts/:id", async (req, res) => {
+  try {
+    const { estado, respuestaAdmin } = req.body;
+    const payload = {};
+    if (estado) payload.estado = estado;
+    if (typeof respuestaAdmin === "string") payload.respuestaAdmin = respuestaAdmin;
+
+    const updated = await Contact.findByIdAndUpdate(req.params.id, payload, { new: true });
+    if (!updated) {
+      return res.status(404).json({ msg: "Contacto no encontrado" });
+    }
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ msg: "Error al actualizar contacto", error: error.message });
   }
 });
 
