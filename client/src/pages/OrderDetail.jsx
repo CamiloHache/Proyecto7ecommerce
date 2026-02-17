@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/userContext";
 import "./OrderDetail.css";
@@ -10,9 +10,11 @@ const getOrderCode = (order) =>
 
 const OrderDetail = () => {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { token, user } = useContext(UserContext);
-  const isAdmin = user?.rol === "admin";
+  const isAdminRoute = location.pathname.startsWith("/ventas/");
+  const isAdmin = isAdminRoute || user?.rol === "admin";
   const apiUrl = useMemo(() => import.meta.env.VITE_API_URL || "http://localhost:4000", []);
 
   const [order, setOrder] = useState(null);
@@ -29,7 +31,7 @@ const OrderDetail = () => {
       setLoading(true);
       setError("");
       try {
-        const endpoint = isAdmin
+        const endpoint = isAdminRoute
           ? `${apiUrl}/api/admin/orders/${id}`
           : `${apiUrl}/api/users/me/orders/${id}`;
         const res = await axios.get(endpoint, { headers: { "x-auth-token": token } });
@@ -38,13 +40,35 @@ const OrderDetail = () => {
         setEditNota(res.data.notaContacto || "");
         setEditMedioPago(res.data.medioPago || "stripe");
       } catch (err) {
-        setError(err.response?.data?.msg || "No se pudo cargar la venta");
+        try {
+          const fallbackEndpoint = isAdminRoute
+            ? `${apiUrl}/api/admin/orders`
+            : `${apiUrl}/api/users/me/orders`;
+          const fallbackRes = await axios.get(fallbackEndpoint, {
+            headers: { "x-auth-token": token },
+          });
+          const found = (fallbackRes.data || []).find((o) => String(o._id) === String(id));
+          if (!found) {
+            setError("No se pudo cargar la venta");
+          } else {
+            setOrder(found);
+            setEditState(found.estado || "recibido");
+            setEditNota(found.notaContacto || "");
+            setEditMedioPago(found.medioPago || "stripe");
+          }
+        } catch (fallbackErr) {
+          setError(
+            fallbackErr.response?.data?.msg ||
+              err.response?.data?.msg ||
+              "No se pudo cargar la venta"
+          );
+        }
       } finally {
         setLoading(false);
       }
     };
     loadOrder();
-  }, [apiUrl, id, isAdmin, token]);
+  }, [apiUrl, id, isAdminRoute, token]);
 
   const saveOrder = async () => {
     setMessage("");
