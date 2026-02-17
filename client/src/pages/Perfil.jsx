@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { UserContext } from "../context/userContext";
+import { Link } from "react-router-dom";
 import "./Perfil.css";
 
 const Perfil = () => {
@@ -84,13 +85,18 @@ const Perfil = () => {
             <ul className="perfil-orders">
               {orders.map((order) => (
                 <li key={order._id}>
-                  <span>
-                    {new Date(order.createdAt).toLocaleDateString("es-CL")} - $
-                    {Number(order.total || 0).toLocaleString("es-CL")}
-                  </span>
-                  <span className={`estado estado-${order.estado}`}>
-                    {order.estado}
-                  </span>
+                  <div className="perfil-order-main">
+                    <span>
+                      {new Date(order.createdAt).toLocaleDateString("es-CL")} - $
+                      {Number(order.total || 0).toLocaleString("es-CL")}
+                    </span>
+                    <span className={`estado estado-${order.estado}`}>
+                      {order.estado}
+                    </span>
+                  </div>
+                  <Link className="perfil-order-link" to={`/mis-compras/${order._id}`}>
+                    Ver detalle
+                  </Link>
                 </li>
               ))}
             </ul>

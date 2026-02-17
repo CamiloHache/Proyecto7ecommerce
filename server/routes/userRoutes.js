@@ -58,4 +58,16 @@ router.get("/me/orders", auth, async (req, res) => {
   }
 });
 
+router.get("/me/orders/:id", auth, async (req, res) => {
+  try {
+    const order = await Order.findOne({ _id: req.params.id, user: req.user.id });
+    if (!order) {
+      return res.status(404).json({ msg: "Pedido no encontrado" });
+    }
+    res.json(order);
+  } catch (error) {
+    res.status(400).json({ msg: "Error al obtener el detalle del pedido" });
+  }
+});
+
 module.exports = router;

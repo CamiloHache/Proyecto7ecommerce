@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/userContext";
 import "./Admin.css";
@@ -11,6 +12,8 @@ const initialProduct = {
   imagen: "",
   stock: "",
   categoria: "",
+  activo: true,
+  ordenCatalogo: 0,
 };
 
 const initialNews = {
@@ -20,14 +23,12 @@ const initialNews = {
   publicada: true,
 };
 
-const orderStates = [
-  "pendiente",
-  "pagado",
-  "procesando",
-  "enviado",
-  "entregado",
-  "cancelado",
-];
+const initialUser = {
+  nombre: "",
+  email: "",
+  password: "",
+  rol: "cliente",
+};
 
 const Admin = () => {
   const { token } = useContext(UserContext);
@@ -50,7 +51,7 @@ const Admin = () => {
   const [editingProductId, setEditingProductId] = useState("");
 
   const [editingUser, setEditingUser] = useState({});
-  const [editingOrder, setEditingOrder] = useState({});
+  const [newUserForm, setNewUserForm] = useState(initialUser);
   const [editingContact, setEditingContact] = useState({});
 
   const [newsForm, setNewsForm] = useState(initialNews);
@@ -108,14 +109,24 @@ const Admin = () => {
       if (editingProductId) {
         await axios.put(
           `${apiUrl}/api/admin/products/${editingProductId}`,
-          { ...productForm, precio: Number(productForm.precio), stock: Number(productForm.stock) },
+          {
+            ...productForm,
+            precio: Number(productForm.precio),
+            stock: Number(productForm.stock),
+            ordenCatalogo: Number(productForm.ordenCatalogo || 0),
+          },
           authConfig
         );
         setMessage("Producto actualizado.");
       } else {
         await axios.post(
           `${apiUrl}/api/admin/products`,
-          { ...productForm, precio: Number(productForm.precio), stock: Number(productForm.stock) },
+          {
+            ...productForm,
+            precio: Number(productForm.precio),
+            stock: Number(productForm.stock),
+            ordenCatalogo: Number(productForm.ordenCatalogo || 0),
+          },
           authConfig
         );
         setMessage("Producto creado.");
@@ -137,6 +148,8 @@ const Admin = () => {
       imagen: p.imagen || "",
       stock: p.stock ?? "",
       categoria: p.categoria || "",
+      activo: p.activo ?? true,
+      ordenCatalogo: p.ordenCatalogo ?? 0,
     });
     setActiveTab("productos");
   };
@@ -163,14 +176,27 @@ const Admin = () => {
     }
   };
 
-  const saveOrder = async (id) => {
+  const createUser = async (e) => {
+    e.preventDefault();
     clearFeedback();
     try {
-      await axios.put(`${apiUrl}/api/admin/orders/${id}`, editingOrder[id], authConfig);
-      setMessage("Venta actualizada.");
+      await axios.post(`${apiUrl}/api/admin/users`, newUserForm, authConfig);
+      setMessage("Usuario creado.");
+      setNewUserForm(initialUser);
       loadData();
-    } catch {
-      setError("Error al actualizar venta");
+    } catch (err) {
+      setError(err.response?.data?.msg || "No se pudo crear usuario");
+    }
+  };
+
+  const deleteUser = async (id) => {
+    clearFeedback();
+    try {
+      await axios.delete(`${apiUrl}/api/admin/users/${id}`, authConfig);
+      setMessage("Usuario eliminado.");
+      loadData();
+    } catch (err) {
+      setError(err.response?.data?.msg || "No se pudo eliminar usuario");
     }
   };
 
@@ -226,6 +252,26 @@ const Admin = () => {
     }
   };
 
+  const exportOrders = async () => {
+    clearFeedback();
+    try {
+      const res = await axios.get(`${apiUrl}/api/admin/orders-export`, {
+        ...authConfig,
+        responseType: "blob",
+      });
+      const blob = new Blob([res.data], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `reporte-ventas-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      setMessage("Reporte exportado.");
+    } catch {
+      setError("No se pudo exportar el reporte de ventas");
+    }
+  };
+
   return (
     <section className="admin-page">
       <h1>Panel administrador</h1>
@@ -268,7 +314,7 @@ const Admin = () => {
             <input
               placeholder="Precio"
               type="number"
-              min="0"
+              min="50"
               value={productForm.precio}
               onChange={(e) => setProductForm({ ...productForm, precio: e.target.value })}
               required
@@ -293,6 +339,25 @@ const Admin = () => {
               onChange={(e) => setProductForm({ ...productForm, categoria: e.target.value })}
               required
             />
+            <input
+              placeholder="Orden en catálogo (0,1,2...)"
+              type="number"
+              min="0"
+              value={productForm.ordenCatalogo}
+              onChange={(e) =>
+                setProductForm({ ...productForm, ordenCatalogo: e.target.value })
+              }
+            />
+            <label className="admin-check">
+              <input
+                type="checkbox"
+                checked={!!productForm.activo}
+                onChange={(e) =>
+                  setProductForm({ ...productForm, activo: e.target.checked })
+                }
+              />
+              Visible en catálogo
+            </label>
             <button type="submit">{editingProductId ? "Guardar cambios" : "Crear producto"}</button>
           </form>
 
@@ -305,6 +370,8 @@ const Admin = () => {
                     <strong>{p.nombre}</strong>
                     <span>
                       ${Number(p.precio || 0).toLocaleString("es-CL")} - stock {p.stock ?? 0}
+                      {" · "}orden {p.ordenCatalogo ?? 0}
+                      {" · "}{p.activo ? "visible" : "oculto"}
                     </span>
                   </div>
                   <div className="admin-actions">
@@ -313,6 +380,25 @@ const Admin = () => {
                     </button>
                     <button type="button" className="danger" onClick={() => deleteProduct(p._id)}>
                       Eliminar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        clearFeedback();
+                        try {
+                          await axios.put(
+                            `${apiUrl}/api/admin/products/${p._id}`,
+                            { activo: !p.activo },
+                            authConfig
+                          );
+                          setMessage(p.activo ? "Producto ocultado." : "Producto visible en catálogo.");
+                          loadData();
+                        } catch {
+                          setError("No se pudo cambiar visibilidad del producto");
+                        }
+                      }}
+                    >
+                      {p.activo ? "Ocultar" : "Mostrar"}
                     </button>
                   </div>
                 </li>
@@ -323,93 +409,123 @@ const Admin = () => {
       ) : null}
 
       {activeTab === "clientes" ? (
-        <div className="admin-card">
-          <h2>Clientes</h2>
-          <ul className="admin-list">
-            {users.map((u) => (
-              <li key={u._id}>
-                <div className="admin-user-fields">
-                  <input
-                    value={editingUser[u._id]?.nombre ?? u.nombre}
-                    onChange={(e) =>
-                      setEditingUser((prev) => ({
-                        ...prev,
-                        [u._id]: { ...prev[u._id], nombre: e.target.value },
-                      }))
-                    }
-                  />
-                  <input
-                    value={editingUser[u._id]?.email ?? u.email}
-                    onChange={(e) =>
-                      setEditingUser((prev) => ({
-                        ...prev,
-                        [u._id]: { ...prev[u._id], email: e.target.value },
-                      }))
-                    }
-                  />
-                  <select
-                    value={editingUser[u._id]?.rol ?? u.rol}
-                    onChange={(e) =>
-                      setEditingUser((prev) => ({
-                        ...prev,
-                        [u._id]: { ...prev[u._id], rol: e.target.value },
-                      }))
-                    }
-                  >
-                    <option value="cliente">cliente</option>
-                    <option value="admin">admin</option>
-                  </select>
-                </div>
-                <button type="button" onClick={() => saveUser(u._id)}>
-                  Guardar
-                </button>
-              </li>
-            ))}
-          </ul>
+        <div className="admin-grid">
+          <form className="admin-card" onSubmit={createUser}>
+            <h2>Crear usuario</h2>
+            <input
+              placeholder="Nombre"
+              value={newUserForm.nombre}
+              onChange={(e) => setNewUserForm({ ...newUserForm, nombre: e.target.value })}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={newUserForm.email}
+              onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={newUserForm.password}
+              onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
+              required
+              minLength={6}
+            />
+            <select
+              value={newUserForm.rol}
+              onChange={(e) => setNewUserForm({ ...newUserForm, rol: e.target.value })}
+            >
+              <option value="cliente">cliente</option>
+              <option value="admin">admin</option>
+            </select>
+            <button type="submit">Crear usuario</button>
+          </form>
+
+          <div className="admin-card">
+            <h2>Clientes</h2>
+            <ul className="admin-list">
+              {users.map((u) => (
+                <li key={u._id}>
+                  <div className="admin-user-fields">
+                    <input
+                      value={editingUser[u._id]?.nombre ?? u.nombre}
+                      onChange={(e) =>
+                        setEditingUser((prev) => ({
+                          ...prev,
+                          [u._id]: { ...prev[u._id], nombre: e.target.value },
+                        }))
+                      }
+                    />
+                    <input
+                      value={editingUser[u._id]?.email ?? u.email}
+                      onChange={(e) =>
+                        setEditingUser((prev) => ({
+                          ...prev,
+                          [u._id]: { ...prev[u._id], email: e.target.value },
+                        }))
+                      }
+                    />
+                    <select
+                      value={editingUser[u._id]?.rol ?? u.rol}
+                      onChange={(e) =>
+                        setEditingUser((prev) => ({
+                          ...prev,
+                          [u._id]: { ...prev[u._id], rol: e.target.value },
+                        }))
+                      }
+                    >
+                      <option value="cliente">cliente</option>
+                      <option value="admin">admin</option>
+                    </select>
+                  </div>
+                  <div className="admin-actions">
+                    <button type="button" onClick={() => saveUser(u._id)}>
+                      Guardar
+                    </button>
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => deleteUser(u._id)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       ) : null}
 
       {activeTab === "ventas" ? (
         <div className="admin-card">
           <h2>Ventas y contacto cliente</h2>
+          <div className="admin-actions">
+            <button type="button" className="admin-export-link" onClick={exportOrders}>
+              Exportar reporte (Excel/CSV)
+            </button>
+          </div>
           <ul className="admin-list">
             {orders.map((o) => (
               <li key={o._id} className="admin-order-item">
                 <div>
                   <strong>
-                    {o.user?.nombre || "Cliente"} - ${Number(o.total || 0).toLocaleString("es-CL")}
+                    Pedido {o.numeroPedido || o._id}
                   </strong>
-                  <span>{new Date(o.createdAt).toLocaleString("es-CL")}</span>
+                  <span>
+                    {new Date(o.createdAt).toLocaleString("es-CL")} - {o.user?.nombre || "Cliente"} - $
+                    {Number(o.total || 0).toLocaleString("es-CL")} - {o.estado}
+                  </span>
+                  <span>
+                    Procesado por: {o.actualizadoPorNombre || "Sin asignar"}
+                  </span>
                 </div>
                 <div className="admin-order-controls">
-                  <select
-                    value={editingOrder[o._id]?.estado ?? o.estado}
-                    onChange={(e) =>
-                      setEditingOrder((prev) => ({
-                        ...prev,
-                        [o._id]: { ...prev[o._id], estado: e.target.value },
-                      }))
-                    }
-                  >
-                    {orderStates.map((st) => (
-                      <option key={st} value={st}>
-                        {st}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    placeholder="Nota de contacto al cliente"
-                    value={editingOrder[o._id]?.notaContacto ?? o.notaContacto ?? ""}
-                    onChange={(e) =>
-                      setEditingOrder((prev) => ({
-                        ...prev,
-                        [o._id]: { ...prev[o._id], notaContacto: e.target.value },
-                      }))
-                    }
-                  />
-                  <button type="button" onClick={() => saveOrder(o._id)}>
-                    Guardar
-                  </button>
+                  <Link className="admin-order-detail-link" to={`/ventas/${o._id}`}>
+                    Ver / procesar venta
+                  </Link>
                 </div>
               </li>
             ))}

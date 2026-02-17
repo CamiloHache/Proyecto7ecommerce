@@ -15,6 +15,7 @@ import ProyectoMemorice from "./pages/ProyectoMemorice";
 import ColaboracionDetalle from "./pages/ColaboracionDetalle";
 import Contacto from "./pages/Contacto";
 import Prensa from "./pages/Prensa";
+import OrderDetail from "./pages/OrderDetail";
 import { UserContext } from "./context/userContext";
 import "./App.css";
 
@@ -51,6 +52,22 @@ function App() {
             <Route path="/colaboraciones/:slug" element={<ColaboracionDetalle />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/prensa" element={<Prensa />} />
+            <Route
+              path="/ventas/:id"
+              element={
+                <AdminRoute>
+                  <OrderDetail />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/mis-compras/:id"
+              element={
+                <PrivateRoute>
+                  <OrderDetail />
+                </PrivateRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route

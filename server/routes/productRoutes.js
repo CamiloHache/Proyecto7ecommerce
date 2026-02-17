@@ -14,6 +14,8 @@ const normalizeProduct = (productDoc) => {
         descripcion: p?.descripcion ?? p?.description ?? "",
         categoria: p?.categoria ?? p?.category ?? "",
         stock: p?.stock ?? 0,
+        activo: p?.activo ?? true,
+        ordenCatalogo: p?.ordenCatalogo ?? 0,
     };
 };
 
@@ -24,12 +26,17 @@ const mapPayloadToProduct = (body = {}) => ({
     imagen: body.imagen ?? body.image,
     stock: body.stock,
     categoria: body.categoria ?? body.category,
+    activo: typeof body.activo === "boolean" ? body.activo : undefined,
+    ordenCatalogo:
+        typeof body.ordenCatalogo === "number"
+            ? body.ordenCatalogo
+            : (body.ordenCatalogo !== undefined ? Number(body.ordenCatalogo) : undefined),
 });
 
 // GET todos los productos
 router.get('/', async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find({ activo: true }).sort({ ordenCatalogo: 1, createdAt: -1 });
         res.json(products.map(normalizeProduct));
     } catch (error) {
         res.status(500).json({ message: "Error al obtener productos" });
@@ -39,7 +46,7 @@ router.get('/', async (req, res) => {
 // GET producto por id
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findOne({ _id: req.params.id, activo: true });
 
         if (!product) {
             return res.status(404).json({ message: "Producto no encontrado" });

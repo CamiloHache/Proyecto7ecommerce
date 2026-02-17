@@ -12,14 +12,27 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+    numeroPedido: {
+      type: String,
+      required: true,
+      unique: true,
+      default: () => `M-${Date.now().toString().slice(-8)}-${Math.floor(Math.random() * 900 + 100)}`,
+    },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     items: { type: [orderItemSchema], required: true },
     total: { type: Number, required: true, min: 0 },
+    medioPago: {
+      type: String,
+      enum: ["stripe", "transferencia"],
+      default: "stripe",
+    },
     estado: {
       type: String,
-      enum: ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"],
-      default: "pendiente",
+      enum: ["recibido", "procesado", "entregado", "pendiente", "pagado", "procesando", "enviado", "cancelado"],
+      default: "recibido",
     },
+    actualizadoPor: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    actualizadoPorNombre: { type: String, default: "" },
     stripeSessionId: { type: String, default: "" },
     stripePaymentStatus: { type: String, default: "" },
     notaContacto: { type: String, default: "" },

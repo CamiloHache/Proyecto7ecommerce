@@ -113,6 +113,7 @@
 .admin-actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .admin-actions .danger {
@@ -131,8 +132,25 @@
 
 .admin-order-controls {
   display: grid;
-  grid-template-columns: 180px 1fr auto;
-  gap: 0.5rem;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+.admin-order-detail-link,
+.admin-export-link {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #111827;
+  background: #fff;
+  font-weight: 600;
+}
+
+.admin-export-link {
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid #111827 !important;
 }
 
 .admin-check {

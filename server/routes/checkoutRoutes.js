@@ -18,7 +18,10 @@ router.post('/', auth, async (req, res) => {
 
         const lineItems = products.map((product) => {
             const nombreProducto = product.nombre || product.name;
-            const precioProducto = product.precio || product.price;
+            const precioProducto = Number(product.precio || product.price || 0);
+            if (precioProducto < 50) {
+                throw new Error(`El producto "${nombreProducto}" debe tener un precio mínimo de $50 CLP para Stripe.`);
+            }
 
             return {
                 price_data: {
@@ -48,6 +51,8 @@ router.post('/', auth, async (req, res) => {
             user: req.user.id,
             items: orderItems,
             total,
+            estado: "recibido",
+            medioPago: "stripe",
         });
 
         const session = await stripe.checkout.sessions.create({

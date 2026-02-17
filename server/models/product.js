@@ -13,7 +13,7 @@ const productSchema = new mongoose.Schema({
     precio: {
         type: Number,
         required: [true, 'El precio es obligatorio'],
-        min: 0
+        min: 50
     },
     imagen: {
         type: String,
@@ -26,6 +26,14 @@ const productSchema = new mongoose.Schema({
     categoria: {
         type: String,
         required: [true, 'La categoría es obligatoria']
+    },
+    activo: {
+        type: Boolean,
+        default: true
+    },
+    ordenCatalogo: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true 

@@ -75,13 +75,25 @@
 }
 
 .perfil-orders li {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.perfil-order-main {
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 10px;
   font-size: 0.9rem;
+}
+
+.perfil-order-link {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-decoration: none;
+  color: #111827;
+  font-weight: 600;
+  width: fit-content;
 }
 
 .estado {
