@@ -122,8 +122,19 @@ const Navbar = () => {
   const { token, user, logout } = useContext(UserContext);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const closeMobileMenu = () => setIsMenuOpen(false);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = searchTerm.trim();
+    closeMobileMenu();
+    if (!query) {
+      navigate("/productos");
+      return;
+    }
+    navigate(`/productos?q=${encodeURIComponent(query)}`);
+  };
 
   return (
     <header className="navbar-header">
@@ -144,11 +155,6 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-actions">
-          <Link to="/cart" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
-            <CartIcon />
-            <span className="nav-btn-label">Carrito</span>
-          </Link>
-
           <button
             type="button"
             className="nav-btn nav-btn-outline"
@@ -164,12 +170,19 @@ const Navbar = () => {
             </span>
           </button>
 
-          {!token ? (
+          {token ? (
+            <Link to="/cart" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
+              <CartIcon />
+              <span className="nav-btn-label">Carrito</span>
+            </Link>
+          ) : (
             <Link to="/signup" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
               <SignupIcon />
               <span className="nav-btn-label">Sign up</span>
             </Link>
-          ) : (
+          )}
+
+          {token ? (
             <button
               type="button"
               className="nav-btn nav-btn-outline"
@@ -183,7 +196,7 @@ const Navbar = () => {
               <LogoutIcon />
               <span className="nav-btn-label">Logout</span>
             </button>
-          )}
+          ) : null}
 
           {user?.rol === "admin" && (
             <Link to="/admin" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
@@ -191,14 +204,17 @@ const Navbar = () => {
               <span className="nav-btn-label">Panel admin</span>
             </Link>
           )}
-          <div className="navbar-search-wrap">
+          <form className="navbar-search-wrap" onSubmit={handleSearch}>
             <SearchIcon />
             <input
               type="text"
               placeholder="Buscar..."
               className="navbar-search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Buscar productos"
             />
-          </div>
+          </form>
         </div>
       </div>
 

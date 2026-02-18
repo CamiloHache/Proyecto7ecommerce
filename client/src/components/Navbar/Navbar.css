@@ -76,6 +76,11 @@
   line-height: 1;
 }
 
+.nav-btn-label {
+  display: inline-flex;
+  align-items: center;
+}
+
 .nav-btn.nav-btn-outline,
 .nav-btn.outline {
   border: 2px solid #1f1f1c;
@@ -196,8 +201,8 @@
 }
 
 .nav-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -290,8 +295,8 @@
   }
 
   .navbar-actions .nav-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     color: #111111;
   }
 

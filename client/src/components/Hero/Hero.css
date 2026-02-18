@@ -5,23 +5,24 @@
 
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 
-  padding: 44px 20px;
+  padding: 38px 20px 0;
 }
 
 .hero img {
-  max-width: 900px;
+  max-width: 1060px;
   width: 100%;
   height: auto;
+  display: block;
 }
 
 @media (max-width: 768px) {
   .hero {
-    padding: 28px 14px;
+    padding: 22px 12px 0;
   }
 
   .hero img {
-    max-width: 740px;
+    max-width: 860px;
   }
 }
