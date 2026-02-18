@@ -23,6 +23,13 @@
   font-size: 1rem;
 }
 
+.products-page-search-result {
+  text-align: center;
+  margin: -16px 0 28px;
+  color: #3f3a34;
+  font-size: 0.95rem;
+}
+
 .products-page .products-grid {
   display: flex;
   flex-wrap: wrap;
@@ -41,6 +48,10 @@
 
   .products-page-intro {
     margin-bottom: 24px;
+  }
+
+  .products-page-search-result {
+    margin: -8px 0 20px;
   }
 
   .products-page .products-grid {
