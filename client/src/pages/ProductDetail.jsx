@@ -1,12 +1,15 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { CartContext } from "../context/cartContext";
+import { UserContext } from "../context/userContext";
 import "./ProductDetail.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useContext(CartContext);
+  const { token } = useContext(UserContext);
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,6 +54,11 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
+    if (!token) {
+      alert("Para agregar productos al carrito primero debes iniciar sesión.");
+      navigate("/login");
+      return;
+    }
     addToCart(product);
     alert(`${product.nombre} agregado al carrito`);
   };

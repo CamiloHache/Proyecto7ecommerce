@@ -1,12 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { UserContext } from "./userContext";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const { token } = useContext(UserContext);
   const [cart, setCart] = useState([]);
 
   const addToCart = (product) => {
+    if (!token) return;
     setCart((prevCart) => {
       const exists = prevCart.find((item) => item._id === product._id);
       if (exists) {
@@ -18,8 +21,15 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  useEffect(() => {
+    // Requisito de rúbrica: carrito disponible solo con sesión activa.
+    if (!token) {
+      setCart([]);
+    }
+  }, [token]);
+
   const removeFromCart = (productId) => {
-    setCart(cart.filter((item) => item._id !== productId));
+    setCart((prev) => prev.filter((item) => item._id !== productId));
   };
 
   const clearCart = useCallback(() => {
