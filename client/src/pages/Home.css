@@ -1,3 +1,109 @@
+.home-news {
+  padding: 42px 24px;
+  background: #1f1f1c;
+  color: #f6f4f1;
+}
+
+.home-news-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.home-news-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.home-news-head h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.home-news-link {
+  border: 1.5px solid #f6f4f1;
+  color: #f6f4f1;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.home-news-link:hover {
+  background: #f6f4f1;
+  color: #1f1f1c;
+}
+
+.home-news-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px;
+  background: #2a2a26;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 244, 241, 0.25);
+  overflow: hidden;
+}
+
+.home-news-image {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+}
+
+.home-news-content {
+  padding: 18px 18px 12px 0;
+}
+
+.home-news-date {
+  margin: 0 0 8px;
+  color: rgba(246, 244, 241, 0.8);
+  font-size: 0.86rem;
+}
+
+.home-news-content h3 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+}
+
+.home-news-content p {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.home-news-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.home-news-controls button {
+  background: transparent;
+  border: 1.5px solid #f6f4f1;
+  color: #f6f4f1;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.home-news-controls button:hover {
+  background: #f6f4f1;
+  color: #1f1f1c;
+}
+
+.home-news-state {
+  margin: 0;
+  padding: 10px 0;
+}
+
 .home-products {
   padding: 64px 24px;
   background: #fff;
@@ -45,6 +151,35 @@
 }
 
 @media (max-width: 768px) {
+  .home-news {
+    padding: 28px 16px;
+  }
+
+  .home-news-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-news-head h2 {
+    font-size: 1.35rem;
+  }
+
+  .home-news-card {
+    grid-template-columns: 1fr;
+  }
+
+  .home-news-image {
+    min-height: 190px;
+  }
+
+  .home-news-content {
+    padding: 0 14px 8px;
+  }
+
+  .home-news-controls {
+    padding: 0 10px 12px;
+  }
+
   .home-products {
     padding: 36px 16px;
   }

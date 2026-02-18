@@ -1,5 +1,6 @@
-import { useContext } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { ProductContext } from "../context/productContext"; 
 import Hero from "../components/Hero/Hero";
 import ProyectoSection from "../components/ProyectoSection/ProyectoSection";
@@ -28,12 +29,112 @@ const proyectoBlocks = [
 
 const Home = () => {
   const { products, loadingProducts, productsError } = useContext(ProductContext);
+  const [news, setNews] = useState([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const [newsError, setNewsError] = useState("");
+  const [activeNewsIndex, setActiveNewsIndex] = useState(0);
+  const apiUrl = useMemo(
+    () => import.meta.env.VITE_API_URL || "http://localhost:4000",
+    []
+  );
+
+  useEffect(() => {
+    const loadNews = async () => {
+      setNewsLoading(true);
+      setNewsError("");
+      try {
+        const res = await axios.get(`${apiUrl}/api/news`);
+        const items = Array.isArray(res.data) ? res.data : [];
+        setNews(items);
+      } catch {
+        setNewsError("No fue posible cargar los anuncios por ahora.");
+      } finally {
+        setNewsLoading(false);
+      }
+    };
+    loadNews();
+  }, [apiUrl]);
+
+  useEffect(() => {
+    if (!news || news.length < 2) return undefined;
+    const interval = setInterval(() => {
+      setActiveNewsIndex((prev) => (prev + 1) % news.length);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [news]);
+
+  useEffect(() => {
+    if (!news || news.length === 0) {
+      setActiveNewsIndex(0);
+      return;
+    }
+    if (activeNewsIndex > news.length - 1) {
+      setActiveNewsIndex(0);
+    }
+  }, [news, activeNewsIndex]);
+
+  const activeNews = news[activeNewsIndex] || null;
+  const goPrevNews = () => {
+    if (!news.length) return;
+    setActiveNewsIndex((prev) => (prev - 1 + news.length) % news.length);
+  };
+  const goNextNews = () => {
+    if (!news.length) return;
+    setActiveNewsIndex((prev) => (prev + 1) % news.length);
+  };
 
   return (
     <>
       <Hero />
 
       <ProyectoSection icon={proyectoIcon} blocks={proyectoBlocks} />
+
+      <section className="home-news">
+        <div className="home-news-inner">
+          <div className="home-news-head">
+            <h2>Anuncios y eventos</h2>
+            <Link to="/prensa" className="home-news-link">
+              Ir a prensa
+            </Link>
+          </div>
+
+          {newsLoading ? <p className="home-news-state">Cargando anuncios...</p> : null}
+          {!newsLoading && newsError ? <p className="home-news-state">{newsError}</p> : null}
+          {!newsLoading && !newsError && !activeNews ? (
+            <p className="home-news-state">Aún no hay noticias publicadas.</p>
+          ) : null}
+
+          {!newsLoading && !newsError && activeNews ? (
+            <article className="home-news-card">
+              {activeNews.imagen ? (
+                <img src={activeNews.imagen} alt={activeNews.titulo} className="home-news-image" />
+              ) : null}
+
+              <div className="home-news-content">
+                <p className="home-news-date">
+                  {new Date(activeNews.createdAt).toLocaleDateString("es-CL")}
+                </p>
+                <h3>{activeNews.titulo}</h3>
+                <p>{activeNews.contenido}</p>
+              </div>
+
+              {news.length > 1 ? (
+                <div className="home-news-controls">
+                  <button type="button" onClick={goPrevNews} aria-label="Noticia anterior">
+                    Anterior
+                  </button>
+                  <span>
+                    {activeNewsIndex + 1} / {news.length}
+                  </span>
+                  <button type="button" onClick={goNextNews} aria-label="Siguiente noticia">
+                    Siguiente
+                  </button>
+                </div>
+              ) : null}
+            </article>
+          ) : null}
+        </div>
+      </section>
 
       <section className="home-products">
         <div className="home-products-inner">
