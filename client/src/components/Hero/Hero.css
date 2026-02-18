@@ -1,4 +1,10 @@
 .hero {
+  
+  --hero-max-width: 1380px;
+  --hero-max-width-mobile: 1080px;
+  --hero-bottom-offset: 100px;
+  --hero-bottom-offset-mobile: 10px;
+
   background-image: url('../../assets/img/texturaroja.png');
   background-size: cover;
   background-position: center;
@@ -12,11 +18,11 @@
 }
 
 .hero img {
-  max-width: 1240px;
+  max-width: var(--hero-max-width);
   width: 100%;
   height: auto;
   display: block;
-  transform: translateY(12px);
+  transform: translateY(var(--hero-bottom-offset));
 }
 
 @media (max-width: 768px) {
@@ -25,7 +31,7 @@
   }
 
   .hero img {
-    max-width: 980px;
-    transform: translateY(8px);
+    max-width: var(--hero-max-width-mobile);
+    transform: translateY(var(--hero-bottom-offset-mobile));
   }
 }
