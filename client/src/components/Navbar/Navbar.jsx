@@ -198,7 +198,7 @@ const Navbar = () => {
             </button>
           ) : null}
 
-          {user?.rol === "admin" && (
+          {token && user?.rol === "admin" && (
             <Link to="/admin" className="nav-btn nav-btn-outline" onClick={closeMobileMenu}>
               <AdminIcon />
               <span className="nav-btn-label">Panel admin</span>
