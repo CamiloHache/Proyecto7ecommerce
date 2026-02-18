@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const buildCommercialCode = () => `SO${String(Date.now() % 100000).padStart(5, "0")}`;
+
 const orderItemSchema = new mongoose.Schema(
   {
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
@@ -14,7 +16,7 @@ const orderSchema = new mongoose.Schema(
   {
     codigoPedido: {
       type: String,
-      default: () => `SO${Date.now().toString().slice(-4)}`,
+      default: buildCommercialCode,
     },
     numeroPedido: {
       type: String,
@@ -43,5 +45,12 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.pre("validate", function applyCommercialCode(next) {
+  if (!this.codigoPedido || !String(this.codigoPedido).trim()) {
+    this.codigoPedido = buildCommercialCode();
+  }
+  next();
+});
 
 module.exports = mongoose.model("Order", orderSchema);

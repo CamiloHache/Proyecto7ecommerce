@@ -15,8 +15,13 @@ const Perfil = () => {
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
   );
-  const getOrderCode = (order) =>
-    order?.codigoPedido || `SO${String(order?._id || "").slice(-4).toUpperCase()}`;
+  const getOrderCode = (order) => {
+    const existing = String(order?.codigoPedido || "").trim();
+    if (existing) return existing;
+    const digitsSource = String(order?.numeroPedido || order?._id || "").replace(/\D/g, "");
+    const numericPart = digitsSource.slice(-5).padStart(5, "0");
+    return `SO${numericPart}`;
+  };
 
   useEffect(() => {
     const getOrders = async () => {

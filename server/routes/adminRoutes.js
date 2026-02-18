@@ -229,6 +229,7 @@ router.get("/orders-export", async (req, res) => {
     const orders = await Order.find().populate("user", "nombre email").sort({ createdAt: -1 });
     const rows = [
       [
+        "codigoPedido",
         "numeroPedido",
         "fecha",
         "cliente",
@@ -239,6 +240,7 @@ router.get("/orders-export", async (req, res) => {
         "actualizadoPor",
       ],
       ...orders.map((o) => [
+        o.codigoPedido || "",
         o.numeroPedido || o._id,
         new Date(o.createdAt).toISOString(),
         o.user?.nombre || "",

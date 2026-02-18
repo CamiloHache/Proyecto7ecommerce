@@ -30,6 +30,14 @@ const initialUser = {
   rol: "cliente",
 };
 
+const getOrderCode = (order) => {
+  const existing = String(order?.codigoPedido || "").trim();
+  if (existing) return existing;
+  const digitsSource = String(order?.numeroPedido || order?._id || "").replace(/\D/g, "");
+  const numericPart = digitsSource.slice(-5).padStart(5, "0");
+  return `SO${numericPart}`;
+};
+
 const Admin = () => {
   const { token } = useContext(UserContext);
   const apiUrl = useMemo(
@@ -512,7 +520,7 @@ const Admin = () => {
               <li key={o._id} className="admin-order-item">
                 <div>
                   <strong>
-                    Pedido {o.numeroPedido || o._id}
+                    Pedido {getOrderCode(o)}
                   </strong>
                   <span>
                     {new Date(o.createdAt).toLocaleString("es-CL")} - {o.user?.nombre || "Cliente"} - $

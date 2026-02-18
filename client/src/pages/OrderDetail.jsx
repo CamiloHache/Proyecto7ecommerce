@@ -5,8 +5,13 @@ import { UserContext } from "../context/userContext";
 import "./OrderDetail.css";
 
 const adminStates = ["recibido", "procesado", "entregado"];
-const getOrderCode = (order) =>
-  order?.codigoPedido || `SO${String(order?._id || "").slice(-4).toUpperCase()}`;
+const getOrderCode = (order) => {
+  const existing = String(order?.codigoPedido || "").trim();
+  if (existing) return existing;
+  const digitsSource = String(order?.numeroPedido || order?._id || "").replace(/\D/g, "");
+  const numericPart = digitsSource.slice(-5).padStart(5, "0");
+  return `SO${numericPart}`;
+};
 
 const OrderDetail = () => {
   const { id } = useParams();
@@ -108,7 +113,7 @@ const OrderDetail = () => {
       <div className="order-detail-head">
         <h1>
           {isAdmin
-            ? `Pedido interno ${order.numeroPedido || order._id}`
+            ? `Pedido ${getOrderCode(order)}`
             : `Pedido ${getOrderCode(order)}`}
         </h1>
         <Link to={isAdmin ? "/admin" : "/perfil"} className="order-detail-back">
@@ -125,7 +130,11 @@ const OrderDetail = () => {
             <p>
               <strong>Número de pedido:</strong> {getOrderCode(order)}
             </p>
-          ) : null}
+          ) : (
+            <p>
+              <strong>Interno:</strong> {order.numeroPedido || order._id}
+            </p>
+          )}
           <p><strong>Estado:</strong> {order.estado}</p>
           <p><strong>Medio de pago:</strong> {order.medioPago || "stripe"}</p>
           <p><strong>Procesado por:</strong> {order.actualizadoPorNombre || "Sin asignar"}</p>
