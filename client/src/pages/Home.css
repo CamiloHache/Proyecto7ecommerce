@@ -1,5 +1,5 @@
 .home-news {
-  padding: 42px 24px;
+  padding: 34px 24px;
   background: #1f1f1c;
   color: #f6f4f1;
 }
@@ -19,7 +19,7 @@
 
 .home-news-head h2 {
   margin: 0;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
 }
 
 .home-news-link {
@@ -38,24 +38,31 @@
 }
 
 .home-news-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 16px;
   background: #2a2a26;
   border-radius: 12px;
   border: 1px solid rgba(246, 244, 241, 0.25);
   overflow: hidden;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.home-news-card-link {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .home-news-image {
   width: 100%;
   height: 100%;
-  min-height: 260px;
+  min-height: 160px;
   object-fit: cover;
 }
 
 .home-news-content {
-  padding: 18px 18px 12px 0;
+  padding: 12px 14px;
 }
 
 .home-news-date {
@@ -66,13 +73,23 @@
 
 .home-news-content h3 {
   margin: 0 0 10px;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
 }
 
 .home-news-content p {
   margin: 0;
-  line-height: 1.5;
-  white-space: pre-line;
+  line-height: 1.45;
+}
+
+.home-news-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home-news-card-link:hover h3 {
+  text-decoration: underline;
 }
 
 .home-news-controls {
@@ -81,7 +98,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 0 16px 16px;
+  padding: 0 12px 12px;
 }
 
 .home-news-controls button {
@@ -152,7 +169,7 @@
 
 @media (max-width: 768px) {
   .home-news {
-    padding: 28px 16px;
+    padding: 24px 16px;
   }
 
   .home-news-head {
@@ -161,19 +178,23 @@
   }
 
   .home-news-head h2 {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
   }
 
   .home-news-card {
+    max-width: 100%;
+  }
+
+  .home-news-card-link {
     grid-template-columns: 1fr;
   }
 
   .home-news-image {
-    min-height: 190px;
+    min-height: 150px;
   }
 
   .home-news-content {
-    padding: 0 14px 8px;
+    padding: 10px 12px;
   }
 
   .home-news-controls {

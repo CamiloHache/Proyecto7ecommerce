@@ -7,22 +7,25 @@
   justify-content: center;
   align-items: flex-end;
 
-  padding: 38px 20px 0;
+  padding: 30px 20px 0;
+  overflow: hidden;
 }
 
 .hero img {
-  max-width: 1060px;
+  max-width: 1240px;
   width: 100%;
   height: auto;
   display: block;
+  transform: translateY(12px);
 }
 
 @media (max-width: 768px) {
   .hero {
-    padding: 22px 12px 0;
+    padding: 18px 10px 0;
   }
 
   .hero img {
-    max-width: 860px;
+    max-width: 980px;
+    transform: translateY(8px);
   }
 }

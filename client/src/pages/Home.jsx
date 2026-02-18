@@ -27,6 +27,12 @@ const proyectoBlocks = [
   },
 ];
 
+const getNewsExcerpt = (text) => {
+  const raw = String(text || "").replace(/\s+/g, " ").trim();
+  if (!raw) return "Lee más en la sección de prensa.";
+  return raw.length > 150 ? `${raw.slice(0, 150)}...` : raw;
+};
+
 const Home = () => {
   const { products, loadingProducts, productsError } = useContext(ProductContext);
   const [news, setNews] = useState([]);
@@ -106,17 +112,19 @@ const Home = () => {
 
           {!newsLoading && !newsError && activeNews ? (
             <article className="home-news-card">
-              {activeNews.imagen ? (
-                <img src={activeNews.imagen} alt={activeNews.titulo} className="home-news-image" />
-              ) : null}
+              <Link to="/prensa" className="home-news-card-link" aria-label={`Ir a prensa: ${activeNews.titulo}`}>
+                {activeNews.imagen ? (
+                  <img src={activeNews.imagen} alt={activeNews.titulo} className="home-news-image" />
+                ) : null}
 
-              <div className="home-news-content">
-                <p className="home-news-date">
-                  {new Date(activeNews.createdAt).toLocaleDateString("es-CL")}
-                </p>
-                <h3>{activeNews.titulo}</h3>
-                <p>{activeNews.contenido}</p>
-              </div>
+                <div className="home-news-content">
+                  <p className="home-news-date">
+                    {new Date(activeNews.createdAt).toLocaleDateString("es-CL")}
+                  </p>
+                  <h3>{activeNews.titulo}</h3>
+                  <p className="home-news-excerpt">{getNewsExcerpt(activeNews.contenido)}</p>
+                </div>
+              </Link>
 
               {news.length > 1 ? (
                 <div className="home-news-controls">
