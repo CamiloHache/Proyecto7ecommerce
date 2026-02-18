@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/userContext";
@@ -38,6 +38,8 @@ const getOrderCode = (order) => {
   return `SO${numericPart}`;
 };
 
+const FEEDBACK_TIMEOUT_MS = 4200;
+
 const Admin = () => {
   const { token } = useContext(UserContext);
   const apiUrl = useMemo(
@@ -64,11 +66,42 @@ const Admin = () => {
 
   const [newsForm, setNewsForm] = useState(initialNews);
   const [editingNewsId, setEditingNewsId] = useState("");
+  const feedbackTimerRef = useRef(null);
 
-  const clearFeedback = () => {
+  const clearFeedbackTimer = useCallback(() => {
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+  }, []);
+
+  const clearFeedback = useCallback(() => {
+    clearFeedbackTimer();
     setMessage("");
     setError("");
-  };
+  }, [clearFeedbackTimer]);
+
+  const showMessage = useCallback(
+    (text) => {
+      clearFeedbackTimer();
+      setError("");
+      setMessage(text);
+      feedbackTimerRef.current = setTimeout(() => setMessage(""), FEEDBACK_TIMEOUT_MS);
+    },
+    [clearFeedbackTimer]
+  );
+
+  const showError = useCallback(
+    (text) => {
+      clearFeedbackTimer();
+      setMessage("");
+      setError(text);
+      feedbackTimerRef.current = setTimeout(() => setError(""), FEEDBACK_TIMEOUT_MS);
+    },
+    [clearFeedbackTimer]
+  );
+
+  useEffect(() => () => clearFeedbackTimer(), [clearFeedbackTimer]);
 
   const loadData = useCallback(async () => {
     clearFeedback();
@@ -102,9 +135,9 @@ const Admin = () => {
     });
 
     if (failed.length > 0) {
-      setError(`No se pudo cargar: ${failed.join(" | ")}`);
+      showError(`No se pudo cargar: ${failed.join(" | ")}`);
     }
-  }, [apiUrl, authConfig]);
+  }, [apiUrl, authConfig, clearFeedback, showError]);
 
   useEffect(() => {
     if (token) loadData();
@@ -125,7 +158,7 @@ const Admin = () => {
           },
           authConfig
         );
-        setMessage("Producto actualizado.");
+        showMessage("Producto actualizado.");
       } else {
         await axios.post(
           `${apiUrl}/api/admin/products`,
@@ -137,13 +170,13 @@ const Admin = () => {
           },
           authConfig
         );
-        setMessage("Producto creado.");
+        showMessage("Producto creado.");
       }
       setProductForm(initialProduct);
       setEditingProductId("");
       loadData();
     } catch (err) {
-      setError(err.response?.data?.msg || "Error al guardar producto");
+      showError(err.response?.data?.msg || "Error al guardar producto");
     }
   };
 
@@ -166,10 +199,10 @@ const Admin = () => {
     clearFeedback();
     try {
       await axios.delete(`${apiUrl}/api/admin/products/${id}`, authConfig);
-      setMessage("Producto eliminado.");
+      showMessage("Producto eliminado.");
       loadData();
     } catch {
-      setError("No se pudo eliminar el producto");
+      showError("No se pudo eliminar el producto");
     }
   };
 
@@ -177,10 +210,10 @@ const Admin = () => {
     clearFeedback();
     try {
       await axios.put(`${apiUrl}/api/admin/users/${id}`, editingUser[id], authConfig);
-      setMessage("Cliente actualizado.");
+      showMessage("Cliente actualizado.");
       loadData();
     } catch (err) {
-      setError(err.response?.data?.msg || "Error al actualizar cliente");
+      showError(err.response?.data?.msg || "Error al actualizar cliente");
     }
   };
 
@@ -188,23 +221,31 @@ const Admin = () => {
     e.preventDefault();
     clearFeedback();
     try {
-      await axios.post(`${apiUrl}/api/admin/users`, newUserForm, authConfig);
-      setMessage("Usuario creado.");
+      const payload = {
+        ...newUserForm,
+        nombre: newUserForm.nombre.trim(),
+        email: newUserForm.email.trim().toLowerCase(),
+      };
+      await axios.post(`${apiUrl}/api/admin/users`, payload, authConfig);
+      showMessage("Usuario creado.");
       setNewUserForm(initialUser);
       loadData();
     } catch (err) {
-      setError(err.response?.data?.msg || "No se pudo crear usuario");
+      showError(err.response?.data?.msg || "No se pudo crear usuario");
     }
   };
 
   const deleteUser = async (id) => {
     clearFeedback();
+    if (!window.confirm("¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.")) {
+      return;
+    }
     try {
       await axios.delete(`${apiUrl}/api/admin/users/${id}`, authConfig);
-      setMessage("Usuario eliminado.");
+      showMessage("Usuario eliminado.");
       loadData();
     } catch (err) {
-      setError(err.response?.data?.msg || "No se pudo eliminar usuario");
+      showError(err.response?.data?.msg || "No se pudo eliminar usuario");
     }
   };
 
@@ -214,16 +255,16 @@ const Admin = () => {
     try {
       if (editingNewsId) {
         await axios.put(`${apiUrl}/api/admin/news/${editingNewsId}`, newsForm, authConfig);
-        setMessage("Noticia actualizada.");
+        showMessage("Noticia actualizada.");
       } else {
         await axios.post(`${apiUrl}/api/admin/news`, newsForm, authConfig);
-        setMessage("Noticia publicada.");
+        showMessage("Noticia publicada.");
       }
       setNewsForm(initialNews);
       setEditingNewsId("");
       loadData();
     } catch {
-      setError("No se pudo guardar la noticia");
+      showError("No se pudo guardar la noticia");
     }
   };
 
@@ -240,12 +281,13 @@ const Admin = () => {
 
   const deleteNews = async (id) => {
     clearFeedback();
+    if (!window.confirm("¿Eliminar esta noticia?")) return;
     try {
       await axios.delete(`${apiUrl}/api/admin/news/${id}`, authConfig);
-      setMessage("Noticia eliminada.");
+      showMessage("Noticia eliminada.");
       loadData();
     } catch {
-      setError("No se pudo eliminar la noticia");
+      showError("No se pudo eliminar la noticia");
     }
   };
 
@@ -253,10 +295,10 @@ const Admin = () => {
     clearFeedback();
     try {
       await axios.put(`${apiUrl}/api/admin/contacts/${id}`, editingContact[id], authConfig);
-      setMessage("Contacto actualizado.");
+      showMessage("Contacto actualizado.");
       loadData();
     } catch {
-      setError("No se pudo actualizar el contacto");
+      showError("No se pudo actualizar el contacto");
     }
   };
 
@@ -274,9 +316,25 @@ const Admin = () => {
       link.download = `reporte-ventas-${new Date().toISOString().slice(0, 10)}.csv`;
       link.click();
       window.URL.revokeObjectURL(url);
-      setMessage("Reporte exportado.");
+      showMessage("Reporte exportado.");
     } catch {
-      setError("No se pudo exportar el reporte de ventas");
+      showError("No se pudo exportar el reporte de ventas");
+    }
+  };
+
+  const deleteDeliveredOrder = async (order) => {
+    clearFeedback();
+    if (order.estado !== "entregado") {
+      showError("Solo se pueden eliminar ventas con estado entregado.");
+      return;
+    }
+    if (!window.confirm(`¿Eliminar la venta ${getOrderCode(order)}?`)) return;
+    try {
+      await axios.delete(`${apiUrl}/api/admin/orders/${order._id}`, authConfig);
+      showMessage("Venta eliminada.");
+      loadData();
+    } catch (err) {
+      showError(err.response?.data?.msg || "No se pudo eliminar la venta");
     }
   };
 
@@ -399,10 +457,12 @@ const Admin = () => {
                             { activo: !p.activo },
                             authConfig
                           );
-                          setMessage(p.activo ? "Producto ocultado." : "Producto visible en catálogo.");
+                          showMessage(
+                            p.activo ? "Producto ocultado." : "Producto visible en catálogo."
+                          );
                           loadData();
                         } catch {
-                          setError("No se pudo cambiar visibilidad del producto");
+                          showError("No se pudo cambiar visibilidad del producto");
                         }
                       }}
                     >
@@ -534,6 +594,15 @@ const Admin = () => {
                   <Link className="admin-order-detail-link" to={`/ventas/${o._id}`}>
                     Ver / procesar venta
                   </Link>
+                  {o.estado === "entregado" ? (
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => deleteDeliveredOrder(o)}
+                    >
+                      Eliminar venta entregada
+                    </button>
+                  ) : null}
                 </div>
               </li>
             ))}

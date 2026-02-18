@@ -120,6 +120,11 @@
   background: #b91c1c;
 }
 
+.admin-order-controls .danger {
+  background: #b91c1c;
+  color: #fff;
+}
+
 .admin-user-fields {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
