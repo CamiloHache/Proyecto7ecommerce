@@ -57,6 +57,10 @@
   margin: 0;
 }
 
+.press-content {
+  white-space: pre-line;
+}
+
 @media (max-width: 900px) {
   .press-grid {
     grid-template-columns: 1fr;

@@ -273,7 +273,7 @@ const Navbar = () => {
           <span className="nav-link">SÍGUENOS</span>
           <div className="dropdown">
             <a href="#">Instagram</a>
-            <a href="#">Twitter</a>
+            <a href="#">TikTok</a>
           </div>
         </div>
       </nav>

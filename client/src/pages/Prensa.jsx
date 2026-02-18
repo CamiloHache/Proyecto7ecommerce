@@ -50,7 +50,7 @@ const Prensa = () => {
                   <p className="press-date">
                     {new Date(item.createdAt).toLocaleDateString("es-CL")}
                   </p>
-                  <p>{item.contenido}</p>
+                  <p className="press-content">{item.contenido}</p>
                 </div>
               </article>
             ))
