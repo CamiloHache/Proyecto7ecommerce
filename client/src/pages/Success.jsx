@@ -35,11 +35,25 @@ const Success = () => {
       const resolvedCode = codeFromQuery || codeFromStorage;
       if (resolvedCode) setOrderCode(resolvedCode);
       localStorage.removeItem("pendingOrderCode");
+      const sessionId = params.get("session_id");
+
+      // Fallback principal: recuperar código por sesión, incluso sin token activo.
+      if (!resolvedCode && sessionId) {
+        try {
+          const codeRes = await axios.get(`${apiUrl}/api/checkout/order-code/${sessionId}`);
+          const codeFromApi = String(codeRes.data?.codigoPedido || "").trim();
+          if (codeFromApi) {
+            setOrderCode(codeFromApi);
+          }
+        } catch {
+          // Si falla, continúa con fallback autenticado.
+        }
+      }
+
       if (!token) {
         setLoadingOrder(false);
         return;
       }
-      const sessionId = params.get("session_id");
       try {
         const endpoint = sessionId
           ? `${apiUrl}/api/users/me/orders/by-session/${sessionId}`

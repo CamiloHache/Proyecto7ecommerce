@@ -5,6 +5,25 @@ const Order = require('../models/order');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+router.get('/order-code/:sessionId', async (req, res) => {
+    try {
+        const sessionId = String(req.params.sessionId || "").trim();
+        if (!sessionId) {
+            return res.status(400).json({ msg: "session_id inválido" });
+        }
+        const order = await Order.findOne({ stripeSessionId: sessionId }).select("codigoPedido numeroPedido");
+        if (!order) {
+            return res.status(404).json({ msg: "Pedido no encontrado para la sesión indicada" });
+        }
+        return res.json({
+            codigoPedido: order.codigoPedido || "",
+            numeroPedido: order.numeroPedido || "",
+        });
+    } catch (error) {
+        return res.status(500).json({ msg: "Error al obtener código de pedido" });
+    }
+});
+
 router.post('/', auth, async (req, res) => {
     try {
         const frontendUrl =
