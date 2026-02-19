@@ -84,6 +84,7 @@ const OrderDetail = () => {
             .filter(
               (item) =>
                 !item.imagen &&
+                !item.image &&
                 item.productId &&
                 !productImageById[String(item.productId)]
             )
@@ -192,9 +193,15 @@ const OrderDetail = () => {
               <li key={`${item.productId || idx}`}>
                 <div className="order-item-main">
                   {item.imagen ||
+                  item.image ||
                   (item.productId && productImageById[String(item.productId)]) ? (
                     <img
-                      src={item.imagen || productImageById[String(item.productId)] || ""}
+                      src={
+                        item.imagen ||
+                        item.image ||
+                        productImageById[String(item.productId)] ||
+                        ""
+                      }
                       alt={item.nombre || "Producto"}
                       className="order-item-thumb"
                     />

@@ -50,7 +50,7 @@ const Success = () => {
         const fetchedCode = getOrderCode(res.data);
         if (fetchedCode) setOrderCode(fetchedCode);
       } catch {
-        setOrderCode("");
+        // Mantiene el código obtenido por query/localStorage si existe.
       } finally {
         setLoadingOrder(false);
       }

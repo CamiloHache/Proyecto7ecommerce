@@ -48,6 +48,7 @@ const Perfil = () => {
               (item) =>
                 item &&
                 !item.imagen &&
+                !item.image &&
                 item.productId &&
                 !productImageById[String(item.productId)]
             )
@@ -137,11 +138,13 @@ const Perfil = () => {
                 <li key={order._id}>
                   <div className="perfil-order-thumb-wrap">
                     {order.items?.[0]?.imagen ||
+                    order.items?.[0]?.image ||
                     (order.items?.[0]?.productId &&
                       productImageById[String(order.items[0].productId)]) ? (
                       <img
                         src={
                           order.items[0].imagen ||
+                          order.items[0].image ||
                           productImageById[String(order.items[0].productId)] ||
                           ""
                         }

@@ -63,8 +63,8 @@
 
 .order-item-thumb,
 .order-item-thumb-fallback {
-  width: 42px;
-  height: 42px;
+  width: 56px;
+  height: 56px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
   flex-shrink: 0;
@@ -131,108 +131,9 @@
   .order-detail-controls {
     grid-template-columns: 1fr;
   }
-}
-.order-detail-page {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  display: grid;
-  gap: 1rem;
-}
-
-.order-detail-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
-.order-detail-back {
-  border: 1px solid #111827;
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: #111827;
-  text-decoration: none;
-}
-
-.order-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.order-detail-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1rem;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.order-detail-items {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.order-detail-items li {
-  display: flex;
-  justify-content: space-between;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 10px;
-  gap: 8px;
-}
-
-.order-detail-controls {
-  display: grid;
-  grid-template-columns: 180px 180px;
-  gap: 0.5rem;
-}
-
-.order-detail-card select,
-.order-detail-card textarea {
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 10px;
-}
-
-.order-detail-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.order-detail-actions button {
-  border: none;
-  border-radius: 8px;
-  background: #111827;
-  color: #fff;
-  padding: 10px 12px;
-  cursor: pointer;
-}
-
-.order-detail-actions .danger {
-  background: #b91c1c;
-}
-
-.order-detail-ok {
-  color: #166534;
-}
-
-.order-detail-error {
-  color: #b91c1c;
-}
-
-@media (max-width: 900px) {
-  .order-detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .order-detail-controls {
-    grid-template-columns: 1fr;
+  .order-item-thumb,
+  .order-item-thumb-fallback {
+    width: 48px;
+    height: 48px;
   }
 }
