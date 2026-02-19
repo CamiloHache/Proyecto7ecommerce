@@ -1,11 +1,22 @@
 const mongoose = require("mongoose");
+const Counter = require("./counter");
 
-const buildCommercialCode = () => `SO${String(Date.now() % 100000).padStart(5, "0")}`;
+const buildCommercialCode = (seq) => `SO${String(seq).padStart(4, "0")}`;
+
+const getNextOrderSequence = async () => {
+  const counter = await Counter.findOneAndUpdate(
+    { key: "orderCode" },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  );
+  return counter.seq;
+};
 
 const orderItemSchema = new mongoose.Schema(
   {
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
     nombre: { type: String, required: true },
+    imagen: { type: String, default: "" },
     precio: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 1 },
   },
@@ -16,7 +27,7 @@ const orderSchema = new mongoose.Schema(
   {
     codigoPedido: {
       type: String,
-      default: buildCommercialCode,
+      default: "",
     },
     numeroPedido: {
       type: String,
@@ -46,11 +57,16 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-orderSchema.pre("validate", function applyCommercialCode(next) {
-  if (!this.codigoPedido || !String(this.codigoPedido).trim()) {
-    this.codigoPedido = buildCommercialCode();
+orderSchema.pre("validate", async function applyCommercialCode(next) {
+  try {
+    if (this.isNew && (!this.codigoPedido || !String(this.codigoPedido).trim())) {
+      const seq = await getNextOrderSequence();
+      this.codigoPedido = buildCommercialCode(seq);
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
 });
 
 module.exports = mongoose.model("Order", orderSchema);

@@ -29,11 +29,15 @@ const Success = () => {
 
   useEffect(() => {
     const loadOrderInfo = async () => {
+      const params = new URLSearchParams(location.search);
+      const codeFromQuery = (params.get("order_code") || "").trim();
+      if (codeFromQuery) {
+        setOrderCode(codeFromQuery);
+      }
       if (!token) {
         setLoadingOrder(false);
         return;
       }
-      const params = new URLSearchParams(location.search);
       const sessionId = params.get("session_id");
       try {
         const endpoint = sessionId
@@ -60,9 +64,9 @@ const Success = () => {
       <p style={{ color: "#374151", marginBottom: "1.5rem", lineHeight: 1.6 }}>
         {loadingOrder
           ? "Estamos confirmando tu pedido..."
-          : `${user?.nombre || "Cliente"}, tu pago fue procesado correctamente${
-              orderCode ? `, tu número de pedido es ${orderCode}` : ""
-            }. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
+          : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente.${
+              orderCode ? ` Tu número de pedido es ${orderCode}.` : ""
+            } Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
       </p>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>

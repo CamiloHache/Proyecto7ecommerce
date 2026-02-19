@@ -60,7 +60,7 @@ router.post('/', auth, async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}&order_code=${encodeURIComponent(order.codigoPedido || "")}`,
             cancel_url: `${frontendUrl}/cart`,
             metadata: {
                 orderId: String(order._id),
