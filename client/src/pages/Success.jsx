@@ -41,7 +41,7 @@ const Success = () => {
       if (!resolvedCode && sessionId) {
         try {
           const codeRes = await axios.get(`${apiUrl}/api/checkout/order-code/${sessionId}`);
-          const codeFromApi = String(codeRes.data?.codigoPedido || "").trim();
+          const codeFromApi = getOrderCode(codeRes.data || {});
           if (codeFromApi) {
             setOrderCode(codeFromApi);
           }
