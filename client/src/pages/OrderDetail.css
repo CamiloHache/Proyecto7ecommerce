@@ -51,6 +51,36 @@
   border-radius: 8px;
   padding: 10px;
   gap: 8px;
+  align-items: center;
+}
+
+.order-item-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.order-item-thumb,
+.order-item-thumb-fallback {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  flex-shrink: 0;
+}
+
+.order-item-thumb {
+  object-fit: cover;
+}
+
+.order-item-thumb-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #efece6;
+  color: #1f1f1c;
+  font-weight: 700;
 }
 
 .order-detail-controls {

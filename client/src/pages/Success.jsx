@@ -31,9 +31,10 @@ const Success = () => {
     const loadOrderInfo = async () => {
       const params = new URLSearchParams(location.search);
       const codeFromQuery = (params.get("order_code") || "").trim();
-      if (codeFromQuery) {
-        setOrderCode(codeFromQuery);
-      }
+      const codeFromStorage = String(localStorage.getItem("pendingOrderCode") || "").trim();
+      const resolvedCode = codeFromQuery || codeFromStorage;
+      if (resolvedCode) setOrderCode(resolvedCode);
+      localStorage.removeItem("pendingOrderCode");
       if (!token) {
         setLoadingOrder(false);
         return;
@@ -46,7 +47,8 @@ const Success = () => {
         const res = await axios.get(endpoint, {
           headers: { "x-auth-token": token },
         });
-        setOrderCode(getOrderCode(res.data));
+        const fetchedCode = getOrderCode(res.data);
+        if (fetchedCode) setOrderCode(fetchedCode);
       } catch {
         setOrderCode("");
       } finally {

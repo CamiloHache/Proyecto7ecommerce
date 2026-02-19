@@ -9,6 +9,7 @@ const Perfil = () => {
   const [nombre, setNombre] = useState(user?.nombre || "");
   const [email, setEmail] = useState(user?.email || "");
   const [orders, setOrders] = useState([]);
+  const [productImageById, setProductImageById] = useState({});
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const apiUrl = useMemo(
@@ -36,6 +37,48 @@ const Perfil = () => {
     };
     if (token) getOrders();
   }, [apiUrl, token]);
+
+  useEffect(() => {
+    const loadMissingThumbnails = async () => {
+      const idsToResolve = Array.from(
+        new Set(
+          orders
+            .map((order) => order.items?.[0])
+            .filter(
+              (item) =>
+                item &&
+                !item.imagen &&
+                item.productId &&
+                !productImageById[String(item.productId)]
+            )
+            .map((item) => String(item.productId))
+        )
+      );
+      if (!idsToResolve.length) return;
+
+      const results = await Promise.allSettled(
+        idsToResolve.map((id) => axios.get(`${apiUrl}/api/products/${id}`))
+      );
+
+      const resolvedImages = {};
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          const data = result.value.data || {};
+          const image = data.imagen || data.image || "";
+          if (image) {
+            resolvedImages[idsToResolve[index]] = image;
+          }
+        }
+      });
+
+      if (Object.keys(resolvedImages).length > 0) {
+        setProductImageById((prev) => ({ ...prev, ...resolvedImages }));
+      }
+    };
+    if (orders.length > 0) {
+      loadMissingThumbnails();
+    }
+  }, [apiUrl, orders, productImageById]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -93,9 +136,15 @@ const Perfil = () => {
               {orders.map((order) => (
                 <li key={order._id}>
                   <div className="perfil-order-thumb-wrap">
-                    {order.items?.[0]?.imagen ? (
+                    {order.items?.[0]?.imagen ||
+                    (order.items?.[0]?.productId &&
+                      productImageById[String(order.items[0].productId)]) ? (
                       <img
-                        src={order.items[0].imagen}
+                        src={
+                          order.items[0].imagen ||
+                          productImageById[String(order.items[0].productId)] ||
+                          ""
+                        }
                         alt={order.items[0].nombre || "Producto comprado"}
                         className="perfil-order-thumb"
                       />

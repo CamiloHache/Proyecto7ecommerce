@@ -272,7 +272,13 @@ const Navbar = () => {
         <div className="nav-item">
           <span className="nav-link">SÍGUENOS</span>
           <div className="dropdown">
-            <a href="https://www.instagram.com/proyectomemorice/">Instagram</a>
+            <a
+              href="https://www.instagram.com/proyectomemorice/"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Instagram
+            </a>
             <a href="#">TikTok</a>
           </div>
         </div>

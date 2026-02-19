@@ -29,6 +29,7 @@ const OrderDetail = () => {
   const [editState, setEditState] = useState("recibido");
   const [editNota, setEditNota] = useState("");
   const [editMedioPago, setEditMedioPago] = useState("stripe");
+  const [productImageById, setProductImageById] = useState({});
 
   useEffect(() => {
     const loadOrder = async () => {
@@ -74,6 +75,44 @@ const OrderDetail = () => {
     };
     loadOrder();
   }, [apiUrl, id, isAdminRoute, token]);
+
+  useEffect(() => {
+    const loadMissingItemImages = async () => {
+      const idsToResolve = Array.from(
+        new Set(
+          (order?.items || [])
+            .filter(
+              (item) =>
+                !item.imagen &&
+                item.productId &&
+                !productImageById[String(item.productId)]
+            )
+            .map((item) => String(item.productId))
+        )
+      );
+      if (!idsToResolve.length) return;
+
+      const results = await Promise.allSettled(
+        idsToResolve.map((productId) => axios.get(`${apiUrl}/api/products/${productId}`))
+      );
+      const nextImages = {};
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          const data = result.value.data || {};
+          const image = data.imagen || data.image || "";
+          if (image) {
+            nextImages[idsToResolve[index]] = image;
+          }
+        }
+      });
+      if (Object.keys(nextImages).length > 0) {
+        setProductImageById((prev) => ({ ...prev, ...nextImages }));
+      }
+    };
+    if (order?.items?.length) {
+      loadMissingItemImages();
+    }
+  }, [apiUrl, order, productImageById]);
 
   const saveOrder = async () => {
     setMessage("");
@@ -151,7 +190,21 @@ const OrderDetail = () => {
           <ul className="order-detail-items">
             {(order.items || []).map((item, idx) => (
               <li key={`${item.productId || idx}`}>
-                <span>{item.nombre}</span>
+                <div className="order-item-main">
+                  {item.imagen ||
+                  (item.productId && productImageById[String(item.productId)]) ? (
+                    <img
+                      src={item.imagen || productImageById[String(item.productId)] || ""}
+                      alt={item.nombre || "Producto"}
+                      className="order-item-thumb"
+                    />
+                  ) : (
+                    <div className="order-item-thumb-fallback" aria-hidden="true">
+                      {String(item.nombre || "M").slice(0, 1).toUpperCase()}
+                    </div>
+                  )}
+                  <span>{item.nombre}</span>
+                </div>
                 <span>
                   {item.quantity} x ${Number(item.precio || 0).toLocaleString("es-CL")}
                 </span>

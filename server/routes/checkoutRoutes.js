@@ -71,7 +71,7 @@ router.post('/', auth, async (req, res) => {
         order.stripeSessionId = session.id;
         await order.save();
 
-        res.json({ id: session.id, url: session.url });
+        res.json({ id: session.id, url: session.url, orderCode: order.codigoPedido });
     } catch (error) {
         console.error("Error en Stripe:", error);
         res.status(500).json({ error: error.message });

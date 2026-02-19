@@ -39,6 +39,8 @@ const Home = () => {
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState("");
   const [activeNewsIndex, setActiveNewsIndex] = useState(0);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [smoothScroll, setSmoothScroll] = useState(true);
   const carouselRef = useRef(null);
   const newsCardsRef = useRef([]);
   const apiUrl = useMemo(
@@ -63,17 +65,16 @@ const Home = () => {
     loadNews();
   }, [apiUrl]);
 
-  useEffect(() => {
-    if (!news || news.length < 2) return undefined;
-    const interval = setInterval(() => {
-      setActiveNewsIndex((prev) => (prev + 1) % news.length);
-    }, 5500);
-    return () => clearInterval(interval);
+  const carouselNews = useMemo(() => {
+    if (!news || news.length === 0) return [];
+    if (news.length === 1) return news;
+    return [...news, news[0]];
   }, [news]);
 
   useEffect(() => {
     if (!news || news.length === 0) {
       setActiveNewsIndex(0);
+      setCarouselIndex(0);
       return;
     }
     if (activeNewsIndex > news.length - 1) {
@@ -81,29 +82,68 @@ const Home = () => {
     }
   }, [news, activeNewsIndex]);
 
+  useEffect(() => {
+    if (!news || news.length < 2) return undefined;
+    const interval = setInterval(() => {
+      setCarouselIndex((prev) => prev + 1);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [news]);
+
+  useEffect(() => {
+    if (!news.length) return;
+    const normalized = carouselIndex % news.length;
+    setActiveNewsIndex(normalized);
+  }, [carouselIndex, news]);
+
   const goToNews = useCallback(
     (targetIndex) => {
       if (!news.length) return;
       const normalized = (targetIndex + news.length) % news.length;
-      setActiveNewsIndex(normalized);
+      setSmoothScroll(true);
+      setCarouselIndex(normalized);
     },
     [news]
   );
 
-  const goPrevNews = () => goToNews(activeNewsIndex - 1);
-  const goNextNews = () => goToNews(activeNewsIndex + 1);
+  const goPrevNews = () => {
+    if (!news.length) return;
+    setSmoothScroll(true);
+    setCarouselIndex((prev) => (prev - 1 + news.length) % news.length);
+  };
+  const goNextNews = () => {
+    if (!news.length) return;
+    setSmoothScroll(true);
+    setCarouselIndex((prev) => prev + 1);
+  };
 
   useEffect(() => {
-    if (!news.length) return;
+    if (!carouselNews.length) return;
     const carousel = carouselRef.current;
-    const currentCard = newsCardsRef.current[activeNewsIndex];
+    const currentCard = newsCardsRef.current[carouselIndex];
     if (carousel && currentCard) {
       const left =
         currentCard.offsetLeft -
         (carousel.clientWidth - currentCard.clientWidth) / 2;
-      carousel.scrollTo({ left, behavior: "smooth" });
+      carousel.scrollTo({ left, behavior: smoothScroll ? "smooth" : "auto" });
     }
-  }, [activeNewsIndex, news]);
+  }, [carouselIndex, carouselNews, smoothScroll]);
+
+  useEffect(() => {
+    if (news.length < 2) return;
+    if (carouselIndex !== news.length) return;
+    const timeout = setTimeout(() => {
+      setSmoothScroll(false);
+      setCarouselIndex(0);
+    }, 420);
+    return () => clearTimeout(timeout);
+  }, [carouselIndex, news]);
+
+  useEffect(() => {
+    if (smoothScroll) return;
+    const raf = requestAnimationFrame(() => setSmoothScroll(true));
+    return () => cancelAnimationFrame(raf);
+  }, [smoothScroll]);
 
   return (
     <>
@@ -129,17 +169,21 @@ const Home = () => {
           {!newsLoading && !newsError && news.length > 0 ? (
             <article className="home-news-card">
               <div className="home-news-carousel" ref={carouselRef}>
-                {news.map((item, index) => (
+                {carouselNews.map((item, index) => (
                   <Link
-                    key={item._id}
+                    key={`${item._id}-${index}`}
                     to={`/prensa/${item._id}`}
                     ref={(el) => {
                       newsCardsRef.current[index] = el;
                     }}
-                    className={`home-news-card-link ${index === activeNewsIndex ? "is-active" : ""}`}
+                    className={`home-news-card-link ${
+                      (news.length > 0 ? index % news.length : 0) === activeNewsIndex
+                        ? "is-active"
+                        : ""
+                    }`}
                     aria-label={`Abrir noticia: ${item.titulo}`}
-                    onFocus={() => setActiveNewsIndex(index)}
-                    onMouseEnter={() => setActiveNewsIndex(index)}
+                    onFocus={() => goToNews(index % news.length)}
+                    onMouseEnter={() => goToNews(index % news.length)}
                   >
                     {item.imagen ? (
                       <img src={item.imagen} alt={item.titulo} className="home-news-image" />

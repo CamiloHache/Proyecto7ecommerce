@@ -31,7 +31,14 @@ const Footer = () => {
         <div className="footer-social">
           <h4>Síguenos</h4>
           <div className="footer-social-links">
-            <a href="https://www.instagram.com/proyectomemorice/" aria-label="Instagram">Instagram</a>
+            <a
+              href="https://www.instagram.com/proyectomemorice/"
+              aria-label="Instagram"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Instagram
+            </a>
             <a href="#" aria-label="TikTok">TikTok</a>
           </div>
         </div>

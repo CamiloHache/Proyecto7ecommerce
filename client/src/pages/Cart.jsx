@@ -49,6 +49,10 @@ const Cart = () => {
       );
 
       const checkoutUrl = res.data?.url;
+      const orderCode = String(res.data?.orderCode || "").trim();
+      if (orderCode) {
+        localStorage.setItem("pendingOrderCode", orderCode);
+      }
       if (!checkoutUrl) {
         setCheckoutError("No se recibió la URL de checkout desde el backend.");
         return;

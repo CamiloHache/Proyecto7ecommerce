@@ -12,7 +12,12 @@ export const UserProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
     const savedToken = localStorage.getItem("token");
     const savedExpiresAt = Number(localStorage.getItem(TOKEN_EXPIRES_KEY) || 0);
-    if (!savedToken || !savedExpiresAt || Date.now() > savedExpiresAt) {
+    const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+    const isAdminUser = savedUser?.rol === "admin";
+    if (
+      !savedToken ||
+      (!isAdminUser && (!savedExpiresAt || Date.now() > savedExpiresAt))
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem(TOKEN_EXPIRES_KEY);
@@ -31,6 +36,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (!token) return;
+    if (user?.rol === "admin") return;
 
     const verifySession = () => {
       const expiresAt = Number(localStorage.getItem(TOKEN_EXPIRES_KEY) || 0);
