@@ -7,7 +7,8 @@ import "./Cart.css";
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, totalPrice } = useContext(CartContext);
+  const { cart, removeFromCart, totalPrice, reservedOrderCode, reserveOrderCodeIfNeeded } =
+    useContext(CartContext);
   const { token, logout } = useContext(UserContext);
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
@@ -26,6 +27,7 @@ const Cart = () => {
     try {
       setIsProcessingCheckout(true);
       setCheckoutError("");
+      const ensuredOrderCode = reservedOrderCode || (await reserveOrderCodeIfNeeded());
 
       const productsPayload = cart.map((item) => ({
         id: item._id,
@@ -40,7 +42,7 @@ const Cart = () => {
 
       const res = await axios.post(
         `${apiUrl}/api/checkout`,
-        { products: productsPayload },
+        { products: productsPayload, codigoPedido: ensuredOrderCode || undefined },
         {
           headers: {
             "x-auth-token": token,

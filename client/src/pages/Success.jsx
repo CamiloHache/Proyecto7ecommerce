@@ -12,6 +12,12 @@ const getOrderCode = (order) => {
   return `SO${numericPart}`;
 };
 
+const getSessionFallbackCode = (sessionId) => {
+  const digits = String(sessionId || "").replace(/\D/g, "");
+  if (!digits) return "";
+  return `SO${digits.slice(-5).padStart(5, "0")}`;
+};
+
 const Success = () => {
   const { clearCart } = useContext(CartContext);
   const { token, user } = useContext(UserContext);
@@ -32,13 +38,14 @@ const Success = () => {
       const params = new URLSearchParams(location.search);
       const codeFromQuery = (params.get("order_code") || "").trim();
       const codeFromStorage = String(localStorage.getItem("pendingOrderCode") || "").trim();
-      const resolvedCode = codeFromQuery || codeFromStorage;
+      const sessionId = params.get("session_id");
+      const codeFromSessionFallback = getSessionFallbackCode(sessionId);
+      const resolvedCode = codeFromQuery || codeFromStorage || codeFromSessionFallback;
       if (resolvedCode) setOrderCode(resolvedCode);
       localStorage.removeItem("pendingOrderCode");
-      const sessionId = params.get("session_id");
 
       // Fallback principal: recuperar código por sesión, incluso sin token activo.
-      if (!resolvedCode && sessionId) {
+      if (sessionId) {
         try {
           const codeRes = await axios.get(`${apiUrl}/api/checkout/order-code/${sessionId}`);
           const codeFromApi = getOrderCode(codeRes.data || {});
@@ -80,9 +87,9 @@ const Success = () => {
       <p style={{ color: "#374151", marginBottom: "1.5rem", lineHeight: 1.6 }}>
         {loadingOrder
           ? "Estamos confirmando tu pedido..."
-          : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente.${
-              orderCode ? ` Tu número de pedido es ${orderCode}.` : ""
-            } Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
+          : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${
+              orderCode || "en confirmación"
+            }. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
       </p>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>

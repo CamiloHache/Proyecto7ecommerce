@@ -2,8 +2,28 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Order = require('../models/order');
+const Counter = require('../models/counter');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const buildCommercialCode = (seq) => `SO${String(seq).padStart(4, "0")}`;
+
+const reserveOrderCode = async () => {
+    const counter = await Counter.findOneAndUpdate(
+        { key: "orderCode" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return buildCommercialCode(counter.seq);
+};
+
+router.get('/reserve-order-code', auth, async (req, res) => {
+    try {
+        const codigoPedido = await reserveOrderCode();
+        return res.json({ codigoPedido });
+    } catch (error) {
+        return res.status(500).json({ msg: "No se pudo reservar número de pedido" });
+    }
+});
 
 router.get('/order-code/:sessionId', async (req, res) => {
     try {
@@ -66,11 +86,14 @@ router.post('/', auth, async (req, res) => {
             (acc, item) => acc + (item.precio * item.quantity),
             0
         );
+        const requestedCode = String(req.body?.codigoPedido || "").trim();
+        const codigoPedido = requestedCode || await reserveOrderCode();
 
         const order = await Order.create({
             user: req.user.id,
             items: orderItems,
             total,
+            codigoPedido,
             estado: "recibido",
             medioPago: "stripe",
         });
