@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import "./Prensa.css";
+
+const getNewsExcerpt = (text) => {
+  const raw = String(text || "").replace(/\s+/g, " ").trim();
+  if (!raw) return "Sin contenido disponible.";
+  return raw.length > 170 ? `${raw.slice(0, 170)}...` : raw;
+};
 
 const Prensa = () => {
   const [news, setNews] = useState([]);
@@ -44,13 +51,20 @@ const Prensa = () => {
           ) : (
             news.map((item) => (
               <article key={item._id} className="press-card">
-                {item.imagen ? <img src={item.imagen} alt={item.titulo} /> : null}
+                <Link to={`/prensa/${item._id}`} className="press-card-media-link">
+                  {item.imagen ? <img src={item.imagen} alt={item.titulo} /> : null}
+                </Link>
                 <div className="press-card-content">
-                  <h2>{item.titulo}</h2>
+                  <h2>
+                    <Link to={`/prensa/${item._id}`}>{item.titulo}</Link>
+                  </h2>
                   <p className="press-date">
                     {new Date(item.createdAt).toLocaleDateString("es-CL")}
                   </p>
-                  <p className="press-content">{item.contenido}</p>
+                  <p className="press-content">{getNewsExcerpt(item.contenido)}</p>
+                  <Link className="press-read-more" to={`/prensa/${item._id}`}>
+                    Leer noticia completa
+                  </Link>
                 </div>
               </article>
             ))

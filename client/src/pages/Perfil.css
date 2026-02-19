@@ -76,7 +76,36 @@
 
 .perfil-orders li {
   display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
   gap: 0.5rem;
+}
+
+.perfil-order-thumb-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.perfil-order-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #d1d5db;
+}
+
+.perfil-order-thumb-fallback {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #efece6;
+  color: #1f1f1c;
+  font-weight: 700;
+  border: 1px solid #d1d5db;
 }
 
 .perfil-order-main {
@@ -119,5 +148,15 @@
 @media (max-width: 900px) {
   .perfil-grid {
     grid-template-columns: 1fr;
+  }
+
+  .perfil-orders li {
+    grid-template-columns: 46px 1fr;
+  }
+
+  .perfil-order-thumb,
+  .perfil-order-thumb-fallback {
+    width: 42px;
+    height: 42px;
   }
 }

@@ -92,6 +92,19 @@ const Perfil = () => {
             <ul className="perfil-orders">
               {orders.map((order) => (
                 <li key={order._id}>
+                  <div className="perfil-order-thumb-wrap">
+                    {order.items?.[0]?.imagen ? (
+                      <img
+                        src={order.items[0].imagen}
+                        alt={order.items[0].nombre || "Producto comprado"}
+                        className="perfil-order-thumb"
+                      />
+                    ) : (
+                      <div className="perfil-order-thumb-fallback" aria-hidden="true">
+                        {order.items?.[0]?.nombre?.slice(0, 1)?.toUpperCase() || "M"}
+                      </div>
+                    )}
+                  </div>
                   <div className="perfil-order-main">
                     <span>
                       {getOrderCode(order)} ·{" "}

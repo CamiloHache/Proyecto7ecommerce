@@ -1,0 +1,73 @@
+.press-detail-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.press-detail-top {
+  margin-bottom: 1rem;
+}
+
+.press-detail-back {
+  display: inline-block;
+  border: 1px solid #111827;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #111827;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.press-detail-back:hover {
+  background: #111827;
+  color: #fff;
+}
+
+.press-detail-error {
+  color: #b91c1c;
+}
+
+.press-detail-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.press-detail-card img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.press-detail-content {
+  padding: 1.2rem;
+}
+
+.press-detail-date {
+  margin: 0 0 0.6rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.press-detail-content h1 {
+  margin: 0 0 0.9rem;
+  font-size: 1.8rem;
+  line-height: 1.2;
+}
+
+.press-detail-text {
+  margin: 0;
+  white-space: pre-line;
+  line-height: 1.7;
+}
+
+.press-detail-actions {
+  margin-top: 1.4rem;
+}
+
+@media (max-width: 768px) {
+  .press-detail-content h1 {
+    font-size: 1.4rem;
+  }
+}

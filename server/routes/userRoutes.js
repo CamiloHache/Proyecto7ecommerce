@@ -58,6 +58,33 @@ router.get("/me/orders", auth, async (req, res) => {
   }
 });
 
+router.get("/me/orders/latest", auth, async (req, res) => {
+  try {
+    const order = await Order.findOne({ user: req.user.id }).sort({ createdAt: -1 });
+    if (!order) {
+      return res.status(404).json({ msg: "Aún no registras compras" });
+    }
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener último pedido del usuario" });
+  }
+});
+
+router.get("/me/orders/by-session/:sessionId", auth, async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      user: req.user.id,
+      stripeSessionId: req.params.sessionId,
+    });
+    if (!order) {
+      return res.status(404).json({ msg: "Pedido no encontrado para la sesión indicada" });
+    }
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ msg: "Error al obtener pedido por sesión" });
+  }
+});
+
 router.get("/me/orders/:id", auth, async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user.id });

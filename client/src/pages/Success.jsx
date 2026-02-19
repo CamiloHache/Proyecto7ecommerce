@@ -1,13 +1,56 @@
-import { useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { Link, useLocation } from "react-router-dom";
 import { CartContext } from "../context/cartContext";
+import { UserContext } from "../context/userContext";
+
+const getOrderCode = (order) => {
+  const existing = String(order?.codigoPedido || "").trim();
+  if (existing) return existing;
+  const digitsSource = String(order?.numeroPedido || order?._id || "").replace(/\D/g, "");
+  const numericPart = digitsSource.slice(-5).padStart(5, "0");
+  return `SO${numericPart}`;
+};
 
 const Success = () => {
   const { clearCart } = useContext(CartContext);
+  const { token, user } = useContext(UserContext);
+  const location = useLocation();
+  const apiUrl = useMemo(
+    () => import.meta.env.VITE_API_URL || "http://localhost:4000",
+    []
+  );
+  const [orderCode, setOrderCode] = useState("");
+  const [loadingOrder, setLoadingOrder] = useState(true);
 
   useEffect(() => {
     clearCart();
   }, [clearCart]);
+
+  useEffect(() => {
+    const loadOrderInfo = async () => {
+      if (!token) {
+        setLoadingOrder(false);
+        return;
+      }
+      const params = new URLSearchParams(location.search);
+      const sessionId = params.get("session_id");
+      try {
+        const endpoint = sessionId
+          ? `${apiUrl}/api/users/me/orders/by-session/${sessionId}`
+          : `${apiUrl}/api/users/me/orders/latest`;
+        const res = await axios.get(endpoint, {
+          headers: { "x-auth-token": token },
+        });
+        setOrderCode(getOrderCode(res.data));
+      } catch {
+        setOrderCode("");
+      } finally {
+        setLoadingOrder(false);
+      }
+    };
+    loadOrderInfo();
+  }, [apiUrl, location.search, token]);
 
   return (
     <section style={{ padding: "2rem 1rem", maxWidth: "900px", margin: "0 auto" }}>
@@ -15,7 +58,11 @@ const Success = () => {
         Compra realizada con exito
       </h1>
       <p style={{ color: "#374151", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-        Tu pago fue procesado correctamente. Gracias por apoyar el proyecto Memorice.
+        {loadingOrder
+          ? "Estamos confirmando tu pedido..."
+          : `${user?.nombre || "Cliente"}, tu pago fue procesado correctamente${
+              orderCode ? `, tu número de pedido es ${orderCode}` : ""
+            }. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
       </p>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>

@@ -38,6 +38,7 @@ router.post('/', auth, async (req, res) => {
         const orderItems = products.map((product) => ({
             productId: product.id || product._id,
             nombre: product.nombre || product.name || "Producto",
+            imagen: product.imagen || product.image || "",
             precio: Number(product.precio || product.price || 0),
             quantity: Number(product.quantity || 1),
         }));
@@ -59,7 +60,7 @@ router.post('/', auth, async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${frontendUrl}/success`,
+            success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${frontendUrl}/cart`,
             metadata: {
                 orderId: String(order._id),

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { ProductContext } from "../context/productContext"; 
@@ -39,6 +39,8 @@ const Home = () => {
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState("");
   const [activeNewsIndex, setActiveNewsIndex] = useState(0);
+  const carouselRef = useRef(null);
+  const newsCardsRef = useRef([]);
   const apiUrl = useMemo(
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
@@ -79,15 +81,29 @@ const Home = () => {
     }
   }, [news, activeNewsIndex]);
 
-  const activeNews = news[activeNewsIndex] || null;
-  const goPrevNews = () => {
+  const goToNews = useCallback(
+    (targetIndex) => {
+      if (!news.length) return;
+      const normalized = (targetIndex + news.length) % news.length;
+      setActiveNewsIndex(normalized);
+    },
+    [news]
+  );
+
+  const goPrevNews = () => goToNews(activeNewsIndex - 1);
+  const goNextNews = () => goToNews(activeNewsIndex + 1);
+
+  useEffect(() => {
     if (!news.length) return;
-    setActiveNewsIndex((prev) => (prev - 1 + news.length) % news.length);
-  };
-  const goNextNews = () => {
-    if (!news.length) return;
-    setActiveNewsIndex((prev) => (prev + 1) % news.length);
-  };
+    const carousel = carouselRef.current;
+    const currentCard = newsCardsRef.current[activeNewsIndex];
+    if (carousel && currentCard) {
+      const left =
+        currentCard.offsetLeft -
+        (carousel.clientWidth - currentCard.clientWidth) / 2;
+      carousel.scrollTo({ left, behavior: "smooth" });
+    }
+  }, [activeNewsIndex, news]);
 
   return (
     <>
@@ -106,36 +122,70 @@ const Home = () => {
 
           {newsLoading ? <p className="home-news-state">Cargando anuncios...</p> : null}
           {!newsLoading && newsError ? <p className="home-news-state">{newsError}</p> : null}
-          {!newsLoading && !newsError && !activeNews ? (
+          {!newsLoading && !newsError && news.length === 0 ? (
             <p className="home-news-state">Aún no hay noticias publicadas.</p>
           ) : null}
 
-          {!newsLoading && !newsError && activeNews ? (
+          {!newsLoading && !newsError && news.length > 0 ? (
             <article className="home-news-card">
-              <Link to="/prensa" className="home-news-card-link" aria-label={`Ir a prensa: ${activeNews.titulo}`}>
-                {activeNews.imagen ? (
-                  <img src={activeNews.imagen} alt={activeNews.titulo} className="home-news-image" />
-                ) : null}
+              <div className="home-news-carousel" ref={carouselRef}>
+                {news.map((item, index) => (
+                  <Link
+                    key={item._id}
+                    to={`/prensa/${item._id}`}
+                    ref={(el) => {
+                      newsCardsRef.current[index] = el;
+                    }}
+                    className={`home-news-card-link ${index === activeNewsIndex ? "is-active" : ""}`}
+                    aria-label={`Abrir noticia: ${item.titulo}`}
+                    onFocus={() => setActiveNewsIndex(index)}
+                    onMouseEnter={() => setActiveNewsIndex(index)}
+                  >
+                    {item.imagen ? (
+                      <img src={item.imagen} alt={item.titulo} className="home-news-image" />
+                    ) : null}
 
-                <div className="home-news-content">
-                  <p className="home-news-date">
-                    {new Date(activeNews.createdAt).toLocaleDateString("es-CL")}
-                  </p>
-                  <h3>{activeNews.titulo}</h3>
-                  <p className="home-news-excerpt">{getNewsExcerpt(activeNews.contenido)}</p>
-                </div>
-              </Link>
+                    <div className="home-news-content">
+                      <p className="home-news-date">
+                        {new Date(item.createdAt).toLocaleDateString("es-CL")}
+                      </p>
+                      <h3>{item.titulo}</h3>
+                      <p className="home-news-excerpt">{getNewsExcerpt(item.contenido)}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
 
               {news.length > 1 ? (
                 <div className="home-news-controls">
-                  <button type="button" onClick={goPrevNews} aria-label="Noticia anterior">
-                    Anterior
+                  <button
+                    type="button"
+                    className="home-news-arrow"
+                    onClick={goPrevNews}
+                    aria-label="Noticia anterior"
+                  >
+                    ‹
                   </button>
-                  <span>
-                    {activeNewsIndex + 1} / {news.length}
-                  </span>
-                  <button type="button" onClick={goNextNews} aria-label="Siguiente noticia">
-                    Siguiente
+
+                  <div className="home-news-dots" aria-label="Seleccionar noticia">
+                    {news.map((item, index) => (
+                      <button
+                        key={item._id}
+                        type="button"
+                        className={`home-news-dot ${index === activeNewsIndex ? "is-active" : ""}`}
+                        onClick={() => goToNews(index)}
+                        aria-label={`Ir a noticia ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="home-news-arrow"
+                    onClick={goNextNews}
+                    aria-label="Siguiente noticia"
+                  >
+                    ›
                   </button>
                 </div>
               ) : null}

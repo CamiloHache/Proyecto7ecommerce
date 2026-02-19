@@ -1,8 +1,8 @@
 .hero {
   
-  --hero-max-width: 1380px;
+  --hero-max-width: 1400px;
   --hero-max-width-mobile: 1080px;
-  --hero-bottom-offset: 100px;
+  --hero-bottom-offset: 80px;
   --hero-bottom-offset-mobile: 10px;
 
   background-image: url('../../assets/img/texturaroja.png');
