@@ -42,7 +42,7 @@ const Success = () => {
       const codeFromSessionFallback = getSessionFallbackCode(sessionId);
       const resolvedCode = codeFromQuery || codeFromStorage || codeFromSessionFallback;
       if (resolvedCode) setOrderCode(resolvedCode);
-      localStorage.removeItem("pendingOrderCode");
+      let shouldClearPendingCode = !!resolvedCode;
 
       // Fallback principal: recuperar código por sesión, incluso sin token activo.
       if (sessionId) {
@@ -51,6 +51,7 @@ const Success = () => {
           const codeFromApi = getOrderCode(codeRes.data || {});
           if (codeFromApi) {
             setOrderCode(codeFromApi);
+            shouldClearPendingCode = true;
           }
         } catch {
           // Si falla, continúa con fallback autenticado.
@@ -58,6 +59,9 @@ const Success = () => {
       }
 
       if (!token) {
+        if (shouldClearPendingCode) {
+          localStorage.removeItem("pendingOrderCode");
+        }
         setLoadingOrder(false);
         return;
       }
@@ -69,10 +73,16 @@ const Success = () => {
           headers: { "x-auth-token": token },
         });
         const fetchedCode = getOrderCode(res.data);
-        if (fetchedCode) setOrderCode(fetchedCode);
+        if (fetchedCode) {
+          setOrderCode(fetchedCode);
+          shouldClearPendingCode = true;
+        }
       } catch {
         // Mantiene el código obtenido por query/localStorage si existe.
       } finally {
+        if (shouldClearPendingCode) {
+          localStorage.removeItem("pendingOrderCode");
+        }
         setLoadingOrder(false);
       }
     };
