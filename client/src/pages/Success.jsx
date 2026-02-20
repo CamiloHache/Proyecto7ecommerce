@@ -1,5 +1,5 @@
-import { useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { CartContext } from "../context/cartContext";
 import { UserContext } from "../context/userContext";
@@ -12,33 +12,37 @@ const Success = () => {
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
   );
-  const [orderCode, setOrderCode] = useState("");
-  const [loadingOrder, setLoadingOrder] = useState(true);
-  const [hasError, setHasError] = useState(false);
+  const [codigoPedido, setCodigoPedido] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const loadOrderInfo = async () => {
-      const params = new URLSearchParams(location.search);
-      const sessionId = params.get("session_id");
-      if (!sessionId) {
-        setHasError(true);
-        setLoadingOrder(false);
-        return;
-      }
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get("orderId");
+    if (!orderId) {
+      const t = setTimeout(() => {
+        setLoading(false);
+        setError(true);
+      }, 0);
+      return () => clearTimeout(t);
+    }
 
-      try {
-        const res = await axios.get(`${apiUrl}/api/checkout/session-status/${sessionId}`);
-        const fetchedCode = String(res.data?.orderCode || "").trim();
-        if (!fetchedCode) throw new Error("Order code vacío");
-        setOrderCode(fetchedCode);
-        clearCart();
-      } catch {
-        setHasError(true);
-      } finally {
-        setLoadingOrder(false);
-      }
-    };
-    loadOrderInfo();
+    let cancelled = false;
+    axios
+      .get(`${apiUrl}/api/checkout/order/${orderId}`)
+      .then((res) => {
+        if (cancelled) return;
+        const code = (res.data?.codigoPedido || "").trim();
+        if (code) {
+          setCodigoPedido(code);
+          clearCart();
+        } else {
+          setError(true);
+        }
+      })
+      .catch(() => { if (!cancelled) setError(true); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [apiUrl, clearCart, location.search]);
 
   return (
@@ -47,11 +51,11 @@ const Success = () => {
         Compra realizada con exito
       </h1>
       <p style={{ color: "#374151", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-        {loadingOrder
+        {loading
           ? "Estamos confirmando tu pedido..."
-          : hasError
-            ? "No pudimos confirmar el número de pedido en este momento. Por favor contacta a ventas@memorice.cl."
-            : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${orderCode}. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
+          : error
+            ? "No pudimos cargar el pedido. Contacta a ventas@memorice.cl con tu comprobante."
+            : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${codigoPedido}. Para consultas escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice.`}
       </p>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
@@ -67,7 +71,6 @@ const Success = () => {
         >
           Volver al inicio
         </Link>
-
         <Link
           to="/productos"
           style={{

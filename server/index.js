@@ -15,6 +15,15 @@ const app = express();
 
 // 2. Middlewares
 app.use(cors());
+
+// Webhook Stripe necesita body raw para verificar firma (antes de express.json)
+const checkoutRoutes = require('./routes/checkoutRoutes');
+app.post(
+  '/api/checkout/webhook',
+  express.raw({ type: 'application/json' }),
+  checkoutRoutes.handleStripeWebhook
+);
+
 app.use(express.json());
 
 // 3. Conexión a MongoDB Atlas
@@ -29,9 +38,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/contact', contactRoutes);
-const checkoutRoutes = require('./routes/checkoutRoutes');
-
-// Usar la ruta
 app.use('/api/checkout', checkoutRoutes);
 
 // 5. Ruta de prueba
