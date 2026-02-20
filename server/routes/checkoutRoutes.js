@@ -13,15 +13,27 @@ router.get('/session-status/:sessionId', async (req, res) => {
             return res.status(400).json({ msg: "session_id inválido" });
         }
 
-        const session = await stripe.checkout.sessions.retrieve(sessionId);
-        const orderCode = String(session?.metadata?.orderCode || "").trim();
+        let orderCode = "";
+
+        try {
+            const session = await stripe.checkout.sessions.retrieve(sessionId);
+            orderCode = String(session?.metadata?.orderCode || "").trim();
+        } catch (stripeError) {
+            // Si Stripe no responde o la sesión no es recuperable, intentamos fallback por DB.
+        }
+
         if (!orderCode) {
-            return res.status(404).json({ msg: "No se encontró orderCode en la sesión" });
+            const order = await Order.findOne({ stripeSessionId: sessionId }).select("codigoPedido");
+            orderCode = String(order?.codigoPedido || "").trim();
+        }
+
+        if (!orderCode) {
+            return res.status(404).json({ msg: "No se encontró orderCode para la sesión" });
         }
 
         return res.json({ orderCode });
     } catch (error) {
-        return res.status(500).json({ msg: "Error al obtener estado de la sesión" });
+        return res.status(500).json({ msg: "Error al obtener estado de la sesión", detail: error.message });
     }
 });
 
