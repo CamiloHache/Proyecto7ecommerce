@@ -26,7 +26,7 @@ const Success = () => {
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
   );
-  const [orderCode, setOrderCode] = useState("");
+  let [orderCode, setOrderCode] = useState("");
   const [loadingOrder, setLoadingOrder] = useState(true);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const Success = () => {
         {loadingOrder
           ? "Estamos confirmando tu pedido..."
           : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${
-              orderCode || "en confirmación"
+              orderCode
             }. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
       </p>
 
