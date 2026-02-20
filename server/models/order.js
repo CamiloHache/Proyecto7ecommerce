@@ -1,16 +1,5 @@
 const mongoose = require("mongoose");
-const Counter = require("./counter");
-
-const buildCommercialCode = (seq) => `SO${String(seq).padStart(4, "0")}`;
-
-const getNextOrderSequence = async () => {
-  const counter = await Counter.findOneAndUpdate(
-    { key: "orderCode" },
-    { $inc: { seq: 1 } },
-    { new: true, upsert: true, setDefaultsOnInsert: true }
-  );
-  return counter.seq;
-};
+const { generateOrderCode } = require("../utils/orderCode");
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -60,8 +49,7 @@ const orderSchema = new mongoose.Schema(
 orderSchema.pre("validate", async function applyCommercialCode(next) {
   try {
     if (this.isNew && (!this.codigoPedido || !String(this.codigoPedido).trim())) {
-      const seq = await getNextOrderSequence();
-      this.codigoPedido = buildCommercialCode(seq);
+      this.codigoPedido = await generateOrderCode();
     }
     next();
   } catch (error) {

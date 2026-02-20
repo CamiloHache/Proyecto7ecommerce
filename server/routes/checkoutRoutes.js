@@ -2,45 +2,26 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Order = require('../models/order');
-const Counter = require('../models/counter');
+const { generateOrderCode } = require('../utils/orderCode');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const buildCommercialCode = (seq) => `SO${String(seq).padStart(4, "0")}`;
 
-const reserveOrderCode = async () => {
-    const counter = await Counter.findOneAndUpdate(
-        { key: "orderCode" },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
-    return buildCommercialCode(counter.seq);
-};
-
-router.get('/reserve-order-code', auth, async (req, res) => {
-    try {
-        const codigoPedido = await reserveOrderCode();
-        return res.json({ codigoPedido });
-    } catch (error) {
-        return res.status(500).json({ msg: "No se pudo reservar número de pedido" });
-    }
-});
-
-router.get('/order-code/:sessionId', async (req, res) => {
+router.get('/session-status/:sessionId', async (req, res) => {
     try {
         const sessionId = String(req.params.sessionId || "").trim();
         if (!sessionId) {
             return res.status(400).json({ msg: "session_id inválido" });
         }
-        const order = await Order.findOne({ stripeSessionId: sessionId }).select("codigoPedido numeroPedido");
-        if (!order) {
-            return res.status(404).json({ msg: "Pedido no encontrado para la sesión indicada" });
+
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const orderCode = String(session?.metadata?.orderCode || "").trim();
+        if (!orderCode) {
+            return res.status(404).json({ msg: "No se encontró orderCode en la sesión" });
         }
-        return res.json({
-            codigoPedido: order.codigoPedido || "",
-            numeroPedido: order.numeroPedido || "",
-        });
+
+        return res.json({ orderCode });
     } catch (error) {
-        return res.status(500).json({ msg: "Error al obtener código de pedido" });
+        return res.status(500).json({ msg: "Error al obtener estado de la sesión" });
     }
 });
 
@@ -86,8 +67,7 @@ router.post('/', auth, async (req, res) => {
             (acc, item) => acc + (item.precio * item.quantity),
             0
         );
-        const requestedCode = String(req.body?.codigoPedido || "").trim();
-        const codigoPedido = requestedCode || await reserveOrderCode();
+        const codigoPedido = await generateOrderCode();
 
         const order = await Order.create({
             user: req.user.id,
@@ -102,11 +82,12 @@ router.post('/', auth, async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}&order_code=${encodeURIComponent(order.codigoPedido || "")}`,
+            success_url: `${frontendUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${frontendUrl}/cart`,
             metadata: {
                 orderId: String(order._id),
                 userId: String(req.user.id),
+                orderCode: String(order.codigoPedido || ""),
             },
         });
 

@@ -4,90 +4,42 @@ import { Link, useLocation } from "react-router-dom";
 import { CartContext } from "../context/cartContext";
 import { UserContext } from "../context/userContext";
 
-const getOrderCode = (order) => {
-  const existing = String(order?.codigoPedido || "").trim();
-  if (existing) return existing;
-  const digitsSource = String(order?.numeroPedido || order?._id || "").replace(/\D/g, "");
-  const numericPart = digitsSource.slice(-5).padStart(5, "0");
-  return `SO${numericPart}`;
-};
-
-const getSessionFallbackCode = (sessionId) => {
-  const digits = String(sessionId || "").replace(/\D/g, "");
-  if (!digits) return "";
-  return `SO${digits.slice(-5).padStart(5, "0")}`;
-};
-
 const Success = () => {
   const { clearCart } = useContext(CartContext);
-  const { token, user } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const location = useLocation();
   const apiUrl = useMemo(
     () => import.meta.env.VITE_API_URL || "http://localhost:4000",
     []
   );
-  let [orderCode, setOrderCode] = useState("");
+  const [orderCode, setOrderCode] = useState("");
   const [loadingOrder, setLoadingOrder] = useState(true);
-
-  useEffect(() => {
-    clearCart();
-  }, [clearCart]);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const loadOrderInfo = async () => {
       const params = new URLSearchParams(location.search);
-      const codeFromQuery = (params.get("order_code") || "").trim();
-      const codeFromStorage = String(localStorage.getItem("pendingOrderCode") || "").trim();
       const sessionId = params.get("session_id");
-      const codeFromSessionFallback = getSessionFallbackCode(sessionId);
-      const resolvedCode = codeFromQuery || codeFromStorage || codeFromSessionFallback;
-      if (resolvedCode) setOrderCode(resolvedCode);
-      let shouldClearPendingCode = !!resolvedCode;
-
-      // Fallback principal: recuperar código por sesión, incluso sin token activo.
-      if (sessionId) {
-        try {
-          const codeRes = await axios.get(`${apiUrl}/api/checkout/order-code/${sessionId}`);
-          const codeFromApi = getOrderCode(codeRes.data || {});
-          if (codeFromApi) {
-            setOrderCode(codeFromApi);
-            shouldClearPendingCode = true;
-          }
-        } catch {
-          // Si falla, continúa con fallback autenticado.
-        }
-      }
-
-      if (!token) {
-        if (shouldClearPendingCode) {
-          localStorage.removeItem("pendingOrderCode");
-        }
+      if (!sessionId) {
+        setHasError(true);
         setLoadingOrder(false);
         return;
       }
+
       try {
-        const endpoint = sessionId
-          ? `${apiUrl}/api/users/me/orders/by-session/${sessionId}`
-          : `${apiUrl}/api/users/me/orders/latest`;
-        const res = await axios.get(endpoint, {
-          headers: { "x-auth-token": token },
-        });
-        const fetchedCode = getOrderCode(res.data);
-        if (fetchedCode) {
-          setOrderCode(fetchedCode);
-          shouldClearPendingCode = true;
-        }
+        const res = await axios.get(`${apiUrl}/api/checkout/session-status/${sessionId}`);
+        const fetchedCode = String(res.data?.orderCode || "").trim();
+        if (!fetchedCode) throw new Error("Order code vacío");
+        setOrderCode(fetchedCode);
+        clearCart();
       } catch {
-        // Mantiene el código obtenido por query/localStorage si existe.
+        setHasError(true);
       } finally {
-        if (shouldClearPendingCode) {
-          localStorage.removeItem("pendingOrderCode");
-        }
         setLoadingOrder(false);
       }
     };
     loadOrderInfo();
-  }, [apiUrl, location.search, token]);
+  }, [apiUrl, clearCart, location.search]);
 
   return (
     <section style={{ padding: "2rem 1rem", maxWidth: "900px", margin: "0 auto" }}>
@@ -97,9 +49,9 @@ const Success = () => {
       <p style={{ color: "#374151", marginBottom: "1.5rem", lineHeight: 1.6 }}>
         {loadingOrder
           ? "Estamos confirmando tu pedido..."
-          : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${
-              orderCode
-            }. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
+          : hasError
+            ? "No pudimos confirmar el número de pedido en este momento. Por favor contacta a ventas@memorice.cl."
+            : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${orderCode}. Para consultas por el estado de tu pedido escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice, vuelve pronto a visitarnos.`}
       </p>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
