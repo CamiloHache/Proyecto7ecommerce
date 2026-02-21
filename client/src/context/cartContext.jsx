@@ -46,7 +46,6 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Carrito activo solo para usuario cliente con sesión.
     if (!canUseCart) {
       setCart([]);
       localStorage.removeItem(CART_STORAGE_KEY);

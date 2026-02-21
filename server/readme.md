@@ -1,55 +1,54 @@
-# Memorice API - Backend
+# API Backend – Memorice eCommerce
 
-API backend del proyecto Memorice eCommerce.
+API del proyecto Memorice eCommerce (Node.js, Express, MongoDB, Stripe).
 
 ## Endpoints principales
 
 ### Auth
-- **POST** `/api/auth/register`: registro de usuario
-- **POST** `/api/auth/login`: login y entrega de JWT
+- `POST /api/auth/register` – Registro de usuario
+- `POST /api/auth/login` – Login y JWT
 
 ### Productos
-- **GET** `/api/products`: listar productos
-- **GET** `/api/products/:id`: obtener producto por id
-- **POST** `/api/products`: crear producto
-- **PUT** `/api/products/:id`: actualizar producto
-- **DELETE** `/api/products/:id`: eliminar producto
+- `GET /api/products` – Listar productos activos
+- `GET /api/products/:id` – Obtener producto por id
+- `POST /api/products` – Crear producto (admin)
+- `PUT /api/products/:id` – Actualizar producto (admin)
+- `DELETE /api/products/:id` – Eliminar producto (admin)
 
 ### Checkout
-- **POST** `/api/checkout`: crea sesion de Stripe (ruta protegida por JWT)
+- `POST /api/checkout` – Crear sesión Stripe y orden en BD (requiere JWT). Redirige a Stripe Checkout; `success_url` incluye `orderId`.
+- `GET /api/checkout/order/:orderId` – Obtener `codigoPedido` y `estado` de una orden (público, para la página de éxito).
+- `POST /api/checkout/webhook` – Webhook Stripe (`checkout.session.completed`). Debe recibir body raw; en este servidor se monta con `express.raw({ type: 'application/json' })` antes de `express.json()`.
 
 ### Usuario autenticado
-- **GET** `/api/users/me`: obtiene perfil del usuario
-- **PUT** `/api/users/me`: actualiza nombre/email del usuario
-- **GET** `/api/users/me/orders`: lista compras del usuario
+- `GET /api/users/me` – Perfil del usuario
+- `PUT /api/users/me` – Actualizar nombre/email
+- `GET /api/users/me/orders` – Historial de compras
+- `GET /api/users/me/orders/:id` – Detalle de una compra
 
 ### Admin (rol `admin`)
-- **GET/POST/PUT/DELETE** `/api/admin/products...`: gestion de catalogo y stock
-- **GET/PUT** `/api/admin/users...`: gestion de clientes y roles
-- **GET/PUT** `/api/admin/orders...`: revision y procesamiento de ventas + nota de contacto
-- **GET/POST/PUT/DELETE** `/api/admin/news...`: gestion de noticias
+- Productos: CRUD y control de visibilidad/orden
+- Usuarios: listar, editar, eliminar
+- Órdenes/ventas: listar, ver detalle, cambiar estado, exportar
+- Noticias: CRUD
+- Contacto: ver mensajes
 
-### Noticias públicas
-- **GET** `/api/news`: lista noticias publicadas
+### Público
+- `GET /api/news` – Listar noticias publicadas
+- `POST /api/contact` – Enviar mensaje de contacto
 
-## Variables de entorno (`server/.env`)
+## Variables de entorno
 
-- `PORT`: puerto del servidor
-- `MONGODB_URI`: cadena de conexion a MongoDB Atlas
-- `JWT_SECRET`: clave para firmar JWT
-- `STRIPE_SECRET_KEY`: clave secreta de Stripe (`sk_test_...`)
-- `FRONTEND_URL`: URL del frontend para redirecciones (`/success` y `/cart`)
+- `PORT` – Puerto del servidor
+- `MONGODB_URI` – Conexión MongoDB Atlas
+- `JWT_SECRET` – Clave JWT
+- `STRIPE_SECRET_KEY` – Clave secreta Stripe (`sk_test_...`)
+- `STRIPE_WEBHOOK_SECRET` – Signing secret del webhook Stripe (`whsec_...`)
+- `FRONTEND_URL` – URL del frontend (para `success_url` y `cancel_url`)
 
 ## Scripts
 
-- `npm run dev`: inicia servidor con nodemon
-- `npm start`: inicia servidor
+- `npm run dev` – Servidor con nodemon
+- `npm start` – Servidor en producción
 
-## Despliegue
-
-- Sugerido: Render o Railway
-- Build command: `npm install`
-- Start command: `npm start`
-- Configurar variables de entorno indicadas arriba
-
-Para documentacion completa revisar el `README.md` de la raiz.
+Para descripción del proyecto y despliegue ver el `README.md` de la raíz del repositorio.

@@ -33,7 +33,6 @@ const mapPayloadToProduct = (body = {}) => ({
             : (body.ordenCatalogo !== undefined ? Number(body.ordenCatalogo) : undefined),
 });
 
-// GET todos los productos
 router.get('/', async (req, res) => {
     try {
         const products = await Product.find({ activo: true }).sort({ ordenCatalogo: 1, createdAt: -1 });
@@ -43,7 +42,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET producto por id
 router.get('/:id', async (req, res) => {
     try {
         const product = await Product.findOne({ _id: req.params.id, activo: true });
@@ -61,7 +59,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// POST crear producto
 router.post('/', auth, authorizeRole("admin"), async (req, res) => {
     try {
         const newProduct = new Product(mapPayloadToProduct(req.body));
@@ -72,7 +69,6 @@ router.post('/', auth, authorizeRole("admin"), async (req, res) => {
     }
 });
 
-// PUT actualizar producto por id
 router.put('/:id', auth, authorizeRole("admin"), async (req, res) => {
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -94,7 +90,6 @@ router.put('/:id', auth, authorizeRole("admin"), async (req, res) => {
     }
 });
 
-// DELETE eliminar producto por id
 router.delete('/:id', auth, authorizeRole("admin"), async (req, res) => {
     try {
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);

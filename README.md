@@ -1,65 +1,58 @@
-# Memorice eCommerce - Proyecto Fullstack
+# Memorice eCommerce – Proyecto Fullstack
 
-Aplicacion fullstack de comercio electronico para Memorice. Permite registro/login de usuarios, catalogo de productos, carrito de compras y pago en Stripe (modo pruebas), con backend en Node/Express y base de datos MongoDB Atlas.
+Aplicación fullstack de comercio electrónico para Proyecto Memorice: catálogo de productos, carrito, autenticación con JWT, pasarela de pagos Stripe (modo pruebas) y panel de administración.
 
-## Stack tecnologico
+## Stack
 
-- Frontend: React + Vite, React Router, Context API, Axios
-- Backend: Node.js, Express, JWT, bcryptjs, Stripe
-- Base de datos: MongoDB Atlas (Mongoose)
+- **Frontend:** React (Vite), React Router, Context API, Axios
+- **Backend:** Node.js, Express, JWT, bcryptjs, Stripe
+- **Base de datos:** MongoDB Atlas (Mongoose)
 
-## Funcionalidades principales
+## Funcionalidades
 
-- Registro e inicio de sesion con JWT
-- Catalogo de productos y detalle por producto
-- Carrito de compras con calculo de total
-- Checkout protegido por token
-- Redireccion a Stripe Checkout
-- Pagina de compra exitosa y limpieza automatica del carrito
-- Perfil cliente editable con historial de compras
-- Roles cliente/admin con panel administrativo
-- Modulos admin para productos, clientes, ventas y noticias
+- Registro e inicio de sesión con JWT
+- Catálogo de productos y detalle por producto
+- Carrito de compras (solo usuarios autenticados)
+- Checkout protegido por token y redirección a Stripe Checkout
+- Página de compra exitosa con número de pedido (SOxxxx)
+- Perfil de usuario con historial de compras
+- Roles cliente/admin y panel administrativo (productos, usuarios, ventas, noticias, contacto)
+- Webhook Stripe para marcar órdenes como pagadas
 
-## URLs de despliegue
+## Despliegue
 
-- Frontend (Vercel/Netlify): **PENDIENTE_AGREGAR_URL**
-- Backend (Render/Railway): **PENDIENTE_AGREGAR_URL**
+Indica aquí las URLs de tu despliegue:
 
-Cuando despliegues, reemplaza estos campos por las URLs reales de produccion.
+- **Frontend:** (ej. Vercel/Netlify)
+- **Backend:** (ej. Render/Railway)
 
 ## Variables de entorno
 
 ### Backend (`server/.env`)
 
-- `PORT`: puerto del servidor (ej. `4000`)
-- `MONGODB_URI`: cadena de conexion de MongoDB Atlas
-- `JWT_SECRET`: clave para firmar tokens JWT
-- `STRIPE_SECRET_KEY`: clave secreta de Stripe en modo test (`sk_test_...`)
-- `FRONTEND_URL`: URL publica del frontend (ej. `https://tu-front.vercel.app`)
+| Variable | Descripción |
+|----------|-------------|
+| `PORT` | Puerto del servidor (ej. 4000) |
+| `MONGODB_URI` | Cadena de conexión MongoDB Atlas |
+| `JWT_SECRET` | Clave para firmar JWT |
+| `STRIPE_SECRET_KEY` | Clave secreta Stripe test (`sk_test_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret del webhook Stripe (`whsec_...`) |
+| `FRONTEND_URL` | URL pública del frontend (redirecciones) |
 
 ### Frontend (`client/.env`)
 
-- `VITE_API_URL`: URL publica del backend (ej. `https://tu-api.onrender.com`)
-- `VITE_STRIPE_PUBLIC_KEY`: clave publica de Stripe en modo test (`pk_test_...`)
+| Variable | Descripción |
+|----------|-------------|
+| `VITE_API_URL` | URL pública del backend |
+| `VITE_STRIPE_PUBLIC_KEY` | Clave pública Stripe test (`pk_test_...`) |
 
-## Roles y acceso
+### Webhook Stripe
 
-- Registro publico crea usuarios con rol `cliente`.
-- Para habilitar un usuario administrador, cambia su campo `rol` a `admin` en MongoDB.
-- El panel admin queda disponible en la ruta `/admin` para usuarios con rol `admin`.
-- Las operaciones sensibles de catalogo (crear/editar/eliminar) requieren token valido y rol `admin`.
+En el Dashboard de Stripe (Developers → Webhooks) configura un endpoint con la URL `https://TU_BACKEND/api/checkout/webhook` y el evento `checkout.session.completed`. Usa el signing secret que te entrega Stripe en `STRIPE_WEBHOOK_SECRET`.
 
-## Checklist de validacion por hito
+## Ejecución local
 
-- Cliente no autenticado: no accede a `/perfil` ni `/admin`.
-- Cliente autenticado: ve navbar contextual (`Hola <nombre>`), puede comprar y ver historial en perfil.
-- Admin autenticado: accede a `/admin` y puede gestionar productos, clientes, ventas, noticias y contactos.
-- Frontend: todas las llamadas HTTP usan `VITE_API_URL` como base.
-- Calidad minima: correr `npm run lint` y `npm run build` en `client` antes de desplegar.
-
-## Ejecucion local
-
-### 1) Backend
+**Backend:**
 
 ```bash
 cd server
@@ -67,7 +60,7 @@ npm install
 npm run dev
 ```
 
-### 2) Frontend
+**Frontend:**
 
 ```bash
 cd client
@@ -77,24 +70,22 @@ npm run dev
 
 ## Despliegue sugerido
 
-### Backend en Render o Railway
-
-- Conecta el repo y selecciona la carpeta `server`
-- Build command: `npm install`
-- Start command: `npm start`
-- Configura variables: `PORT`, `MONGODB_URI`, `JWT_SECRET`, `STRIPE_SECRET_KEY`, `FRONTEND_URL`
-
-### Frontend en Vercel o Netlify
-
-- Conecta el repo y selecciona la carpeta `client`
-- Build command: `npm run build`
-- Output directory: `dist`
-- Configura variables: `VITE_API_URL`, `VITE_STRIPE_PUBLIC_KEY`
+- **Backend (Render/Railway):** raíz `server`, build `npm install`, start `npm start`. Configurar todas las variables de entorno del backend.
+- **Frontend (Vercel/Netlify):** raíz `client`, build `npm run build`, salida `dist`. Configurar `VITE_API_URL` y `VITE_STRIPE_PUBLIC_KEY`.
 
 ## Prueba de pago (Stripe test)
 
-Tarjeta de prueba recomendada:
+- Número de tarjeta: `4242 4242 4242 4242`
+- Fecha y CVC: cualquier valor válido
 
-- Numero: `4242 4242 4242 4242`
-- Fecha: cualquiera futura
-- CVC: cualquiera de 3 digitos
+## Evaluación según rúbrica del proyecto
+
+| Área | Peso | Cumplimiento estimado |
+|------|------|----------------------|
+| Gestión de productos | 30% | CRUD productos, catálogo, detalle, listado; admin con visibilidad y orden |
+| Autenticación | 30% | Registro, login, JWT, perfil, rutas privadas, roles cliente/admin |
+| Pasarela de pagos / eCommerce | 20% | Carrito, checkout protegido, Stripe Checkout, página success con número de pedido, webhook |
+| Despliegue | 20% | Completar al publicar front y back y actualizar URLs en este README |
+| Entrega a tiempo | 10% | Según calendario del bootcamp |
+
+Documentación detallada del API en `server/readme.md`.

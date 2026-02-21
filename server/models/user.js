@@ -23,8 +23,6 @@ const userSchema = new mongoose.Schema({
         enum: ["cliente", "admin"],
         default: 'cliente' 
     }
-}, { 
-    timestamps: true // Esto crea automáticamente las fechas de creación y actualización
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

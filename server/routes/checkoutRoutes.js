@@ -6,8 +6,6 @@ const { generateOrderCode } = require('../utils/orderCode');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// ——— GET /api/checkout/order/:orderId (público) ———
-// Devuelve codigoPedido y estado para la página de éxito.
 router.get('/order/:orderId', async (req, res) => {
   try {
     const orderId = String(req.params.orderId || '').trim();
@@ -30,7 +28,6 @@ router.get('/order/:orderId', async (req, res) => {
   }
 });
 
-// ——— POST /api/checkout (crear orden en BD y sesión Stripe) ———
 router.post('/', auth, async (req, res) => {
   try {
     const frontendUrl =
@@ -103,8 +100,6 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// ——— Webhook Stripe (checkout.session.completed) ———
-// Debe montarse en index.js con express.raw({ type: 'application/json' }) para verificar firma.
 function handleStripeWebhook(req, res) {
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
