@@ -279,7 +279,13 @@ const Navbar = () => {
             >
               Instagram
             </a>
-            <a href="#">TikTok</a>
+            <a
+              href="https://www.tiktok.com/@proyecto.memorice?_r=1&_t=ZS-943xJwwvPK1"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              TikTok
+            </a>
           </div>
         </div>
       </nav>

@@ -39,7 +39,14 @@ const Footer = () => {
             >
               Instagram
             </a>
-            <a href="#" aria-label="TikTok">TikTok</a>
+            <a
+              href="https://www.tiktok.com/@proyecto.memorice?_r=1&_t=ZS-943xJwwvPK1"
+              aria-label="TikTok"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              TikTok
+            </a>
           </div>
         </div>
       </div>
