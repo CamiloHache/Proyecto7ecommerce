@@ -1,91 +1,70 @@
-# Memorice eCommerce – Proyecto Fullstack
+# Proyecto 7 eCommerce
 
-Aplicación fullstack de comercio electrónico para Proyecto Memorice: catálogo de productos, carrito, autenticación con JWT, pasarela de pagos Stripe (modo pruebas) y panel de administración.
+Proyecto final del bootcamp de desarrollo web full stack: aplicación de comercio electrónico para **Proyecto Memorice** (marca del cliente). Los usuarios pueden registrarse, explorar el catálogo, agregar productos al carrito y pagar con tarjeta vía Stripe (modo pruebas). Incluye panel de administración para productos, usuarios, ventas y noticias.
 
-## Stack
+## Qué hace la aplicación
 
-- **Frontend:** React (Vite), React Router, Context API, Axios
-- **Backend:** Node.js, Express, JWT, bcryptjs, Stripe
-- **Base de datos:** MongoDB Atlas (Mongoose)
+- **Público:** Catálogo, noticias, secciones informativas (proyecto, colaboraciones, contacto).
+- **Cliente registrado:** Inicio de sesión, perfil editable, carrito, checkout en Stripe, historial de compras con número de pedido (formato SOxxxx).
+- **Administrador:** Panel en `/admin`: CRUD de productos (visibilidad y orden), usuarios, ventas (estados recibido/procesado/entregado), noticias y mensajes de contacto. Las órdenes se marcan como pagadas mediante webhook de Stripe.
 
-## Funcionalidades
+## Stack (MERN + Stripe)
 
-- Registro e inicio de sesión con JWT
-- Catálogo de productos y detalle por producto
-- Carrito de compras (solo usuarios autenticados)
-- Checkout protegido por token y redirección a Stripe Checkout
-- Página de compra exitosa con número de pedido (SOxxxx)
-- Perfil de usuario con historial de compras
-- Roles cliente/admin y panel administrativo (productos, usuarios, ventas, noticias, contacto)
-- Webhook Stripe para marcar órdenes como pagadas
+- **Frontend:** React (Vite), React Router, Context API, Axios.
+- **Backend:** Node.js, Express, JWT, bcryptjs, Stripe.
+- **Base de datos:** MongoDB Atlas (Mongoose).
+- **Pasarela de pago:** Stripe (modo test).
 
-## Despliegue
+## En producción
 
-Indica aquí las URLs de tu despliegue:
+| Entorno | URL |
+|---------|-----|
+| Frontend | https://proyecto7ecommerce.vercel.app/ |
+| Backend  | https://proyecto7ecommerce.onrender.com |
+| Webhook Stripe | https://proyecto7ecommerce.onrender.com/api/checkout/webhook |
 
-- **Frontend:** (ej. Vercel/Netlify)
-- **Backend:** (ej. Render/Railway)
+*Las credenciales de prueba (usuario admin y cliente) se envían en el correo de entrega del proyecto, no se publican en este repositorio.*
 
-## Variables de entorno
+## Cómo usar el proyecto
 
-### Backend (`server/.env`)
+### Ejecución en local
+
+1. **Backend:** `cd server`, `npm install`, `npm run dev` (servidor en `http://localhost:4000` por defecto).
+2. **Frontend:** `cd client`, `npm install`, `npm run dev` (app en `http://localhost:5173`).
+3. Crear `server/.env` según la tabla de variables más abajo (referencia en `server/.env.example`). En `client`, crear `.env` con `VITE_API_URL=http://localhost:4000` y `VITE_STRIPE_PUBLIC_KEY` (clave pública de Stripe en modo test).
+
+### Despliegue
+
+- **Backend (Render):** Raíz `server`, build `npm install`, start `npm start`. Configurar en el servicio las variables de entorno del backend.
+- **Frontend (Vercel):** Raíz `client`, build `npm run build`, directorio de salida `dist`. Variables: `VITE_API_URL` (URL del backend) y `VITE_STRIPE_PUBLIC_KEY`.
+
+### Variables de entorno
+
+**Backend (`server/.env`):**
 
 | Variable | Descripción |
 |----------|-------------|
-| `PORT` | Puerto del servidor (ej. 4000) |
-| `MONGODB_URI` | Cadena de conexión MongoDB Atlas |
-| `JWT_SECRET` | Clave para firmar JWT |
-| `STRIPE_SECRET_KEY` | Clave secreta Stripe test (`sk_test_...`) |
-| `STRIPE_WEBHOOK_SECRET` | Signing secret del webhook Stripe (`whsec_...`) |
-| `FRONTEND_URL` | URL pública del frontend (redirecciones) |
+| `PORT` | Puerto del servidor (ej. 4000). |
+| `MONGODB_URI` | Cadena de conexión MongoDB Atlas. |
+| `JWT_SECRET` | Clave para firmar JWT. |
+| `STRIPE_SECRET_KEY` | Clave secreta Stripe test (`sk_test_...`). |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret del webhook Stripe (`whsec_...`). |
+| `FRONTEND_URL` | URL del frontend (ej. `https://proyecto7ecommerce.vercel.app`) para redirecciones de Stripe. |
 
-### Frontend (`client/.env`)
+**Frontend (`client/.env`):**
 
 | Variable | Descripción |
 |----------|-------------|
-| `VITE_API_URL` | URL pública del backend |
-| `VITE_STRIPE_PUBLIC_KEY` | Clave pública Stripe test (`pk_test_...`) |
+| `VITE_API_URL` | URL del backend (ej. `https://proyecto7ecommerce.onrender.com`). |
+| `VITE_STRIPE_PUBLIC_KEY` | Clave pública Stripe test (`pk_test_...`). |
 
-### Webhook Stripe
+**Webhook Stripe:** En Stripe Dashboard (Developers → Webhooks), añadir endpoint con URL `https://proyecto7ecommerce.onrender.com/api/checkout/webhook` y evento `checkout.session.completed`. El signing secret se configura en `STRIPE_WEBHOOK_SECRET` en el backend.
 
-En el Dashboard de Stripe (Developers → Webhooks) configura un endpoint con la URL `https://TU_BACKEND/api/checkout/webhook` y el evento `checkout.session.completed`. Usa el signing secret que te entrega Stripe en `STRIPE_WEBHOOK_SECRET`.
+### Prueba de pago (Stripe test)
 
-## Ejecución local
+- Tarjeta: `4242 4242 4242 4242`
+- Fecha y CVC: cualquier valor futuro/válido.
 
-**Backend:**
+---
 
-```bash
-cd server
-npm install
-npm run dev
-```
-
-**Frontend:**
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-## Despliegue sugerido
-
-- **Backend (Render/Railway):** raíz `server`, build `npm install`, start `npm start`. Configurar todas las variables de entorno del backend.
-- **Frontend (Vercel/Netlify):** raíz `client`, build `npm run build`, salida `dist`. Configurar `VITE_API_URL` y `VITE_STRIPE_PUBLIC_KEY`.
-
-## Prueba de pago (Stripe test)
-
-- Número de tarjeta: `4242 4242 4242 4242`
-- Fecha y CVC: cualquier valor válido
-
-## Evaluación según rúbrica del proyecto
-
-| Área | Peso | Cumplimiento estimado |
-|------|------|----------------------|
-| Gestión de productos | 30% | CRUD productos, catálogo, detalle, listado; admin con visibilidad y orden |
-| Autenticación | 30% | Registro, login, JWT, perfil, rutas privadas, roles cliente/admin |
-| Pasarela de pagos / eCommerce | 20% | Carrito, checkout protegido, Stripe Checkout, página success con número de pedido, webhook |
-| Despliegue | 20% | Completar al publicar front y back y actualizar URLs en este README |
-| Entrega a tiempo | 10% | Según calendario del bootcamp |
-
-Documentación detallada del API en `server/readme.md`.
+**Proyecto 7 eCommerce** — Desarrollo: Tiúke Studio.
