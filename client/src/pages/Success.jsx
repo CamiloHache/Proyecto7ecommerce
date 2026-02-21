@@ -54,7 +54,7 @@ const Success = () => {
         {loading
           ? "Estamos confirmando tu pedido..."
           : error
-            ? "No pudimos cargar el pedido. Contacta a ventas@memorice.cl con tu comprobante."
+            ? `Hola ${user?.nombre || "cliente"}, gracias por comprar en nuestra tienda. Tu pago fue recibido correctamente. Tu número de pedido será enviado a tu correo ${user?.email || "registrado en tu cuenta"}. Puedes hacer seguimiento a tu compra desde tu perfil. Gracias por tu compra, vuelve pronto.`
             : `Hola ${user?.nombre || "cliente"}, tu pago fue procesado correctamente. Tu número de pedido es ${codigoPedido}. Para consultas escríbenos a ventas@memorice.cl. Gracias por apoyar a Proyecto Memorice.`}
       </p>
 
